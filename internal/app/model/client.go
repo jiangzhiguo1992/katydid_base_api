@@ -16,7 +16,7 @@ type Client struct {
 
 	IP       int  `json:"IP"`       // 系列 (eg:大富翁IP)
 	Part     int  `json:"part"`     // 类型 (eg:单机版)
-	Platform int  `json:"platform"` // 平台 (Android/IOS/Web/PC/MACOS/WeChat/DouYin/...)
+	Platform int  `json:"platform"` // 平台 (Android/IOS/Web/PC/MACOS/WeChat/DouYin/TaoBao/...)
 	SSO      bool `json:"sso"`      // 是否单点登录 (Single Sign-On)
 	SBO      bool `json:"sbo"`      // 身份唯一 (身份证/护照/...) (Single Bio)
 	Enable   bool `json:"enable"`   // 是否可用 (一般不用，下架之类的，从conf读取)

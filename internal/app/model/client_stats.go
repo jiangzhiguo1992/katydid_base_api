@@ -1,11 +1,18 @@
 package model
 
+const (
+	ClientStatsKindWatched  = 1 // 查看Watched
+	ClientStatsKindDownload = 2 // 下载Download
+	ClientStatsKindOpener   = 3 // 启动Opener
+	ClientStatsKindScore    = 4 // 评分Score
+)
+
 // ClientStats 客户端统计量
 type ClientStats struct {
 	*Base
 	Cid   int64 `json:"cid"`   // 客户端id
 	CVid  int64 `json:"cvid"`  // 客户端版本id
-	Kind  int   `json:"kind"`  // 类型 (1:查看Watched 2:下载Download 3:启动Opener 4:评分Score)
+	Kind  int   `json:"kind"`  // 类型
 	Year  int   `json:"year"`  // 年
 	Month int   `json:"month"` // 月
 	Day   int   `json:"day"`   // 日

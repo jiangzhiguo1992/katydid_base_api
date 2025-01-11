@@ -3,14 +3,14 @@ package model
 // ClientVersion 客户端版本
 type ClientVersion struct {
 	*Base
+	Area     int    `json:"area"`     // 区域编号 (从conf读取，不一定是国家或洲际)
+	Market   int    `json:"market"`   // 渠道
 	Cid      int64  `json:"cid"`      // 客户端id (多对一)
 	Cname    string `json:"cname"`    // 客户端名称 (可能需要替换Client.Name)
 	CIconUrl string `json:"cIconUrl"` // 客户端图标
 	CDesc    string `json:"cDesc"`    // 客户端描述
-	CKind    int    `json:"cKind"`    // 客户端类型
+	CKind    string `json:"cKind"`    // 客户端类型 (Market里的分类)
 
-	Area    int      `json:"area"`    // 区域编号 (自己编吧，不一定是国家或洲际)
-	Market  int      `json:"market"`  // 渠道
 	PageUrl string   `json:"pageUrl"` // 产品页面 (方便控制台跳转)
 	Code    int      `json:"code"`    // 版本标识
 	Name    string   `json:"name"`    // 版本名
@@ -30,13 +30,13 @@ type ClientVersion struct {
 
 func NewClientVersion(
 	base *Base,
+	area int,
+	market int,
 	cid int64,
 	cname string,
 	ciconUrl string,
 	cdesc string,
-	ckind int,
-	area int,
-	market int,
+	ckind string,
 	pageUrl string,
 	code int,
 	name string,
@@ -48,13 +48,13 @@ func NewClientVersion(
 ) *ClientVersion {
 	return &ClientVersion{
 		Base:      base,
+		Area:      area,
+		Market:    market,
 		Cid:       cid,
 		Cname:     cname,
 		CIconUrl:  ciconUrl,
 		CDesc:     cdesc,
 		CKind:     ckind,
-		Area:      area,
-		Market:    market,
 		PageUrl:   pageUrl,
 		Code:      code,
 		Name:      name,
