@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 // TODO:GG PGSQL <- BioCard = Users
 // TODO:GG PGSQL <- BioAuth = Users
 
@@ -19,8 +21,9 @@ type IBioCard interface {
 	GetBackUrl() string  // 身份证背面
 
 	IsAdults() bool                  // 是否成年 (和Enable是独立开的)
+	GetAccounts(clientId int64) int  // 账号数 -1为所有
 	IsEnable(clientId int64) bool    // 是否可用 -1为所有都不可用
-	GetReason(clientId int64) string // 拒绝原因
+	GetReason(clientId int64) string // 拒绝原因 -1为所有
 }
 
 // ChinaMainlandBioCard 中国大陆身份证
@@ -134,8 +137,24 @@ func (c ChinaMainlandBioCard) GetBackUrl() string {
 }
 
 func (c ChinaMainlandBioCard) IsAdults() bool {
-	//TODO implement me
-	panic("implement me")
+	currentYear, currentMonth, currentDay := time.Now().Date()
+	age := currentYear - c.Year
+	if currentMonth < time.Month(c.Month) || (currentMonth == time.Month(c.Month) && currentDay < c.Day) {
+		age--
+	}
+	return age >= 18
+}
+
+func (c ChinaMainlandBioCard) GetAccounts(clientId int64) int {
+	var counts int
+	if clientId == -1 {
+		for _, accounts := range c.Accounts {
+			counts += accounts
+		}
+	} else if accounts, ok := c.Accounts[clientId]; ok {
+		counts = accounts
+	}
+	return counts
 }
 
 func (c ChinaMainlandBioCard) IsEnable(clientId int64) bool {

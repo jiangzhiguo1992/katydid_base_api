@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 // ClientVersion 客户端版本 (UIndex = Id / Area+Market+Cid+Code)
 type ClientVersion struct {
 	*Base
@@ -68,4 +70,8 @@ func NewClientVersion(
 		Score:     -1,
 		Comments:  -1,
 	}
+}
+
+func (c *ClientVersion) IsPublished() bool {
+	return c.PublishAt > time.Now().Unix()
 }

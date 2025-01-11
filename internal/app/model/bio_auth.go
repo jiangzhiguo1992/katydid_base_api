@@ -34,13 +34,14 @@ func NewBioAuth(
 	}
 }
 
-func (b *BioAuth) IsAuth() (int, bool) {
+func (b *BioAuth) IsAuthed() ([]int, bool) {
+	var kinds []int
 	for v, ok := range b.Auths {
 		if ok {
-			return v, ok
+			kinds = append(kinds, v)
 		}
 	}
-	return -1, false
+	return kinds, len(kinds) > 0
 }
 
 func (b *BioAuth) AuthByKind(kind int) bool {

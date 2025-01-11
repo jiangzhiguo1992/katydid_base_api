@@ -1,5 +1,7 @@
 package model
 
+import "time"
+
 // TODO:GG PGSQL <- Clients = 100 * Client
 // TODO:GG PGSQL <- Versions = Clients * Version
 // TODO:GG Mongo <- Stats = Versions * (24*365*10) * 4, 懒惰add没有就不add, 数据来源于应用商场?某些渠道没有数据,启动可以自己做？
@@ -29,7 +31,7 @@ type Client struct {
 	Score     int   `json:"score"`     // 当前总评分 (整点更新)
 	Comments  int   `json:"comments"`  // 当前总评数 (整点更新)
 
-	Version string `json:"version"` // 当前已上线版本名
+	Version string `json:"version"` // 当前已上线版本名 (发版的时候自身被动更新)
 }
 
 func NewClient(
@@ -68,4 +70,19 @@ func NewClient(
 		Comments:   -1,
 		Version:    "",
 	}
+}
+
+func (c *Client) IsOnline() bool {
+	currentTime := time.Now().Unix()
+	return c.OnlineAt <= currentTime && (c.OfflineAt == -1 || c.OfflineAt > currentTime)
+}
+
+func (c *Client) IsComingOnline() bool {
+	currentTime := time.Now().Unix()
+	return c.OnlineAt > currentTime && (c.OfflineAt == -1 || c.OfflineAt < currentTime)
+}
+
+func (c *Client) IsComingOffline() bool {
+	currentTime := time.Now().Unix()
+	return c.OfflineAt > currentTime && (c.OnlineAt == -1 || c.OnlineAt < currentTime)
 }
