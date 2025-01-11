@@ -7,7 +7,7 @@ const (
 	ClientStatsKindScore    = 4 // 评分Score
 )
 
-// ClientStats 客户端统计量 (UIndex = 除Num外的所有字段)
+// ClientStats 客户端统计量
 type ClientStats struct {
 	*Base
 	Cid   int64 `json:"cid"`   // 客户端id
@@ -17,7 +17,8 @@ type ClientStats struct {
 	Month int   `json:"month"` // 月
 	Day   int   `json:"day"`   // 日
 	Hour  int   `json:"hour"`  // 时
-	Num   int   `json:"num"`   // 数量
+
+	Num int `json:"num"` // 数量
 }
 
 func NewClientStats(

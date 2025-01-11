@@ -9,7 +9,7 @@ const (
 	BioAuthKindIris   = 6 // 虹膜
 )
 
-// UserBioAuth 生物验证 (UIndex = uicid) (TODO:GG 只存是否验证过，就没必要接口了)
+// UserBioAuth 生物验证 (TODO:GG 只存是否验证过，就没必要接口了)
 type UserBioAuth struct {
 	*Base
 	UICId int64 `json:"uicid"` // 用户身份证id (一对一)
