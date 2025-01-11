@@ -1,6 +1,7 @@
 package model
 
 // TODO:GG PGSQL <- BioCard = Users
+// TODO:GG PGSQL <- BioAuth = Users
 
 // IBioCard 生物卡接口 (身份证/护照/...) (UIndex = Area + Number)
 type IBioCard interface {
@@ -43,6 +44,41 @@ type ChinaMainlandBioCard struct {
 	Accounts map[int64]int    `json:"accounts"` // 账号数
 	Enable   map[int64]bool   `json:"enable"`   // 是否可用
 	Reason   map[int64]string `json:"reason"`   // 拒绝原因
+}
+
+func NewChinaMainlandBioCard(
+	base *Base,
+	area int,
+	number string,
+	name string,
+	sex int,
+	year int,
+	month int,
+	day int,
+	address string,
+	frontUrl string,
+	backUrl string,
+	nation string,
+	period string,
+) *ChinaMainlandBioCard {
+	return &ChinaMainlandBioCard{
+		Base:     base,
+		Area:     area,
+		Number:   number,
+		Name:     name,
+		Sex:      sex,
+		Year:     year,
+		Month:    month,
+		Day:      day,
+		Address:  address,
+		FrontUrl: frontUrl,
+		BackUrl:  backUrl,
+		Nation:   nation,
+		Period:   period,
+		Accounts: map[int64]int{},
+		Enable:   map[int64]bool{},
+		Reason:   map[int64]string{},
+	}
 }
 
 func (c ChinaMainlandBioCard) GetId() int64 {
