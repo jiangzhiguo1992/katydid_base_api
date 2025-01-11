@@ -7,7 +7,7 @@ import "time"
 // TODO:GG Mongo <- Stats = Versions * (24*365*10) * 4, 懒惰add没有就不add, 数据来源于应用商场?某些渠道没有数据,启动可以自己做？
 // TODO:GG Fetch <- Comments = 需要和Market同步，不存DB，api拉取
 
-// Client 客户端 (UIndex = id/ IP+Part)
+// Client 客户端
 type Client struct {
 	*Base
 	IP   int `json:"IP"`   // 系列 (eg:大富翁IP)
@@ -19,11 +19,11 @@ type Client struct {
 	SupportUrl string `json:"supportUrl"` // 服务条款URL
 	PrivacyUrl string `json:"privacyUrl"` // 隐私政策URL
 
-	OnlineAt  int64 `json:"onlineAt"`  // 上线时间 (时间没到时，只能停留在首页)
-	OfflineAt int64 `json:"offlineAt"` // 下线时间 (时间到后，强制升级/等待/etc)
-	SSO       bool  `json:"sso"`       // 是否单点登录 (Single Sign-On)
-	SBO       bool  `json:"sbo"`       // 身份唯一 (身份证/护照/...) (Single Bio)
-	Enable    bool  `json:"enable"`    // 是否可用 (一般不用，下架之类的，从conf读取)
+	OnlineAt       int64 `json:"onlineAt"`       // 上线时间 (时间没到时，只能停留在首页)
+	OfflineAt      int64 `json:"offlineAt"`      // 下线时间 (时间到后，强制升级/等待/etc)
+	UserAccountMax int   `json:"userAccountMax"` // 用户最多账户数 (身份证/护照/...)
+	UserTokenMax   int   `json:"userTokenMax"`   // 用户最多令牌数 (防止工作室?)
+	Enable         bool  `json:"enable"`         // 是否可用 (一般不用，下架之类的，从conf读取)
 
 	Watched  int `json:"watched"`  // 总查看数量 (整点更新)
 	Download int `json:"download"` // 总下载数量 (整点更新)
@@ -31,7 +31,7 @@ type Client struct {
 	Score    int `json:"score"`    // 当前总评分 (整点更新)
 	Comments int `json:"comments"` // 当前总评数 (整点更新)
 
-	LatestVersionNames map[int]map[int]map[int]string `json:"latestVersionNames"` // [area][platform][market]最新版本名 (发版的时候自身被动更新)
+	LatestVersionCodes map[int]map[int]map[int]int `json:"latestVersionCodes"` // [area][platform][market]最新版本号 (发版的时候自身被动更新)
 }
 
 func NewClient(
@@ -43,8 +43,8 @@ func NewClient(
 	website string,
 	supportUrl string,
 	privacyUrl string,
-	SSO bool,
-	SBO bool,
+	userAccountMax int,
+	userTokenMax int,
 	enable bool,
 ) *Client {
 	return &Client{
@@ -58,15 +58,15 @@ func NewClient(
 		PrivacyUrl:         privacyUrl,
 		OnlineAt:           -1,
 		OfflineAt:          -1,
-		SSO:                SSO,
-		SBO:                SBO,
+		UserAccountMax:     userAccountMax,
+		UserTokenMax:       userTokenMax,
 		Enable:             enable,
 		Watched:            -1,
 		Download:           -1,
 		Opener:             -1,
 		Score:              -1,
 		Comments:           -1,
-		LatestVersionNames: map[int]map[int]map[int]string{},
+		LatestVersionCodes: map[int]map[int]map[int]int{},
 	}
 }
 
@@ -85,12 +85,12 @@ func (c *Client) IsComingOffline() bool {
 	return c.OfflineAt > currentTime && (c.OnlineAt == -1 || c.OnlineAt < currentTime)
 }
 
-func (c *Client) GetVersionName(area, platform, market int) string {
-	if _, ok := c.LatestVersionNames[area]; !ok {
-		return ""
+func (c *Client) GetVersionCode(area, platform, market int) int {
+	if _, ok := c.LatestVersionCodes[area]; !ok {
+		return 0
 	}
-	if _, ok := c.LatestVersionNames[area][platform]; !ok {
-		return ""
+	if _, ok := c.LatestVersionCodes[area][platform]; !ok {
+		return 0
 	}
-	return c.LatestVersionNames[area][platform][market]
+	return c.LatestVersionCodes[area][platform][market]
 }
