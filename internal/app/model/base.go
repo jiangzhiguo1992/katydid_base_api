@@ -15,6 +15,14 @@ type (
 	}
 )
 
-func NewBase(id int64, createAt int64, updateAt int64) *Base {
-	return &Base{Id: id, CreateAt: createAt, UpdateAt: updateAt}
+func NewBase(
+	id int64,
+	createAt int64,
+	updateAt int64,
+) *Base {
+	return &Base{
+		Id:       id,
+		CreateAt: createAt,
+		UpdateAt: updateAt,
+	}
 }
