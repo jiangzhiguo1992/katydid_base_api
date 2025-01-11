@@ -5,7 +5,7 @@ package model
 // TODO:GG Mongo <- Stats = Versions * (24*365*10) * 4, 懒惰add没有就不add, 数据来源于应用商场?某些渠道没有数据,启动可以自己做？
 // TODO:GG Fetch <- Comments = 需要和Market同步，不存DB，api拉取
 
-// Client 客户端
+// Client 客户端 (UIndex = id)
 type Client struct {
 	*Base
 	BundleId   string `json:"bundleId"`   // BundleId

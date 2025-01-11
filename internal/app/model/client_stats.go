@@ -7,7 +7,7 @@ const (
 	ClientStatsKindScore    = 4 // 评分Score
 )
 
-// ClientStats 客户端统计量
+// ClientStats 客户端统计量 (UIndex = 除Num外的所有字段)
 type ClientStats struct {
 	*Base
 	Cid   int64 `json:"cid"`   // 客户端id

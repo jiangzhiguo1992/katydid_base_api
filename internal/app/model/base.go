@@ -3,9 +3,9 @@ package model
 type (
 	// IBase 基类接口
 	IBase interface {
-		Id() int64       // id
-		CreateAt() int64 // 首次创建时间
-		UpdateAt() int64 // 最后更新时间
+		GetId() int64       // id
+		GetCreateAt() int64 // 首次创建时间
+		GetUpdateAt() int64 // 最后更新时间
 	}
 	// Base 基类
 	Base struct {

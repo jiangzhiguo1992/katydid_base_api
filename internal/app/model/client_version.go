@@ -1,17 +1,17 @@
 package model
 
-// ClientVersion 客户端版本
+// ClientVersion 客户端版本 (UIndex = Id / Area+Market+Cid+Code)
 type ClientVersion struct {
 	*Base
-	Area     int    `json:"area"`     // 区域编号 (从conf读取，不一定是国家或洲际)
-	Market   int    `json:"market"`   // 渠道
-	Cid      int64  `json:"cid"`      // 客户端id (多对一)
-	Cname    string `json:"cname"`    // 客户端名称 (可能需要替换Client.Name)
-	CIconUrl string `json:"cIconUrl"` // 客户端图标
-	CDesc    string `json:"cDesc"`    // 客户端描述
-	CKind    string `json:"cKind"`    // 客户端类型 (Market里的分类)
+	Area    int    `json:"area"`    // 区域编号 (从conf读取，不一定是国家或洲际)
+	Market  int    `json:"market"`  // 渠道
+	PageUrl string `json:"pageUrl"` // 产品页面 (方便控制台跳转)
 
-	PageUrl string   `json:"pageUrl"` // 产品页面 (方便控制台跳转)
+	Cid   int64  `json:"cid"`   // 客户端id (多对一)
+	Cname string `json:"cname"` // 客户端名称 (可能需要替换Client.Name)
+	Cdesc string `json:"cdesc"` // 客户端描述 (方便复制到应用市场?)
+	Ckind string `json:"ckind"` // 客户端类型 (Market里的分类)
+
 	Code    int      `json:"code"`    // 版本标识
 	Name    string   `json:"name"`    // 版本名
 	Log     string   `json:"log"`     // 升级日志
@@ -32,12 +32,11 @@ func NewClientVersion(
 	base *Base,
 	area int,
 	market int,
+	pageUrl string,
 	cid int64,
 	cname string,
-	ciconUrl string,
 	cdesc string,
 	ckind string,
-	pageUrl string,
 	code int,
 	name string,
 	log string,
@@ -50,12 +49,11 @@ func NewClientVersion(
 		Base:      base,
 		Area:      area,
 		Market:    market,
+		PageUrl:   pageUrl,
 		Cid:       cid,
 		Cname:     cname,
-		CIconUrl:  ciconUrl,
-		CDesc:     cdesc,
-		CKind:     ckind,
-		PageUrl:   pageUrl,
+		Cdesc:     cdesc,
+		Ckind:     ckind,
 		Code:      code,
 		Name:      name,
 		Log:       log,
