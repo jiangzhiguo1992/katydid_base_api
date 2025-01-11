@@ -2,17 +2,14 @@ package model
 
 import "time"
 
-// ClientVersion 客户端版本 (UIndex = Id / Area+Market+Cid+Code)
+// ClientVersion 客户端版本 (UIndex = Id / Cid+Area+Platform+Market+Code)
 type ClientVersion struct {
 	*Base
-	Area    int    `json:"area"`    // 区域编号 (从conf读取，不一定是国家或洲际)
-	Market  int    `json:"market"`  // 渠道
-	PageUrl string `json:"pageUrl"` // 产品页面 (方便控制台跳转)
-
-	Cid   int64  `json:"cid"`   // 客户端id (多对一)
-	Cname string `json:"cname"` // 客户端名称 (可能需要替换Client.Name)
-	Cdesc string `json:"cdesc"` // 客户端描述 (方便复制到应用市场?)
-	Ckind string `json:"ckind"` // 客户端类型 (Market里的分类)
+	Cid      int64  `json:"cid"`      // 客户端id (多对一)
+	Area     int    `json:"area"`     // 区域编号 (从conf读取，不一定是国家或洲际)
+	Platform int    `json:"platform"` // 平台 (Android/IOS/Web/PC/MACOS/WeChat/DouYin/TaoBao/...)
+	Market   int    `json:"market"`   // 渠道
+	PageUrl  string `json:"pageUrl"`  // 产品页面 (方便控制台跳转)
 
 	Code    int      `json:"code"`    // 版本标识
 	Name    string   `json:"name"`    // 版本名
@@ -32,13 +29,11 @@ type ClientVersion struct {
 
 func NewClientVersion(
 	base *Base,
+	cid int64,
 	area int,
+	platform int,
 	market int,
 	pageUrl string,
-	cid int64,
-	cname string,
-	cdesc string,
-	ckind string,
 	code int,
 	name string,
 	log string,
@@ -49,13 +44,11 @@ func NewClientVersion(
 ) *ClientVersion {
 	return &ClientVersion{
 		Base:      base,
+		Cid:       cid,
 		Area:      area,
+		Platform:  platform,
 		Market:    market,
 		PageUrl:   pageUrl,
-		Cid:       cid,
-		Cname:     cname,
-		Cdesc:     cdesc,
-		Ckind:     ckind,
 		Code:      code,
 		Name:      name,
 		Log:       log,
