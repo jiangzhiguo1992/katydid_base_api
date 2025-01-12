@@ -4,7 +4,7 @@ import "time"
 
 // TODO:GG PGSQL <- Clients = 100 * Client
 // TODO:GG PGSQL <- Versions = Clients * Version
-// TODO:GG Mongo <- Stats = Versions * (24*365*10) * 4, 懒惰add没有就不add, 数据来源于应用商场?某些渠道没有数据,启动可以自己做？
+// TODO:GG Mongo <- Stats = Versions * (24*365*10) * 4, 懒惰add没有就不add, 数据来源于应用商场?某些渠道没有数据,启动可以自己做？ (数据量过多可以合并旧数据，时->日->月->年)
 // TODO:GG Fetch <- Comments = 需要和Market同步，不存DB，api拉取
 
 // Client 客户端
@@ -22,7 +22,7 @@ type Client struct {
 	OnlineAt       int64 `json:"onlineAt"`       // 上线时间 (时间没到时，只能停留在首页)
 	OfflineAt      int64 `json:"offlineAt"`      // 下线时间 (时间到后，强制升级/等待/etc)
 	UserAccountMax int   `json:"userAccountMax"` // 用户最多账户数 (身份证/护照/...)
-	UserTokenMax   int   `json:"userTokenMax"`   // 用户最多令牌数 (防止工作室?)
+	UserTokenMax   int   `json:"userTokenMax"`   // 用户最多令牌数 (同时登录最大数，防止工作室?)
 	Enable         bool  `json:"enable"`         // 是否可用 (一般不用，下架之类的，从conf读取)
 
 	Watched  int `json:"watched"`  // 总查看数量 (整点更新)

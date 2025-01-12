@@ -5,9 +5,10 @@ import "time"
 // UserIDCard 用户身份证/护照 (UIndex = Area + Number)
 type UserIDCard struct {
 	*Base
-	Uid    int64  `json:"uid"`    // 用户Id (一对多，双国籍?)
 	Area   int    `json:"area"`   // 区域 (区域政策不一致)
 	Number string `json:"number"` // 身份证号 (唯一标识)
+
+	Uid int64 `json:"uid"` // 用户Id (一对多，双国籍?)
 
 	Name     string                 `json:"name"`     // 姓名
 	Sex      int                    `json:"sex"`      // 性别 (女-1，男+1)
@@ -26,9 +27,9 @@ type UserIDCard struct {
 
 func NewUserIDCard(
 	base *Base,
-	uid int64,
 	area int,
 	number string,
+	uid int64,
 	name string,
 	sex int,
 	nation int,
@@ -43,9 +44,9 @@ func NewUserIDCard(
 ) *UserIDCard {
 	return &UserIDCard{
 		Base:     base,
-		Uid:      uid,
 		Area:     area,
 		Number:   number,
+		Uid:      uid,
 		Name:     name,
 		Sex:      sex,
 		Nation:   nation,
