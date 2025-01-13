@@ -25,13 +25,8 @@ type Client struct {
 	UserTokenMax   int   `json:"userTokenMax"`   // 用户最多令牌数 (同时登录最大数，防止工作室?)
 	Enable         bool  `json:"enable"`         // 是否可用 (一般不用，下架之类的，从conf读取)
 
-	Watched  int `json:"watched"`  // 总查看数量 (整点更新)
-	Download int `json:"download"` // 总下载数量 (整点更新)
-	Opener   int `json:"opener"`   // 总启动数量 (整点更新)
-	Score    int `json:"score"`    // 当前总评分 (整点更新)
-	Comments int `json:"comments"` // 当前总评数 (整点更新)
-
-	LatestVersionCodes map[int]map[int]map[int]int `json:"latestVersionCodes"` // [area][platform][market]最新版本号 (发版的时候自身被动更新)
+	LatestVCodes map[int]map[int]map[int]int `json:"latestVCodes"` // [area][platform][market]最新运行版本号 (发版的时候自身被动更新)
+	StatsList    map[int]int                 `json:"statsList"`    // [stats_kind]统计数据 (整点更新)
 }
 
 func NewClient(
@@ -48,25 +43,21 @@ func NewClient(
 	enable bool,
 ) *Client {
 	return &Client{
-		Base:               base,
-		IP:                 IP,
-		Part:               part,
-		BundleId:           bundleId,
-		Name:               name,
-		Website:            website,
-		SupportUrl:         supportUrl,
-		PrivacyUrl:         privacyUrl,
-		OnlineAt:           -1,
-		OfflineAt:          -1,
-		UserAccountMax:     userAccountMax,
-		UserTokenMax:       userTokenMax,
-		Enable:             enable,
-		Watched:            -1,
-		Download:           -1,
-		Opener:             -1,
-		Score:              -1,
-		Comments:           -1,
-		LatestVersionCodes: map[int]map[int]map[int]int{},
+		Base:           base,
+		IP:             IP,
+		Part:           part,
+		BundleId:       bundleId,
+		Name:           name,
+		Website:        website,
+		SupportUrl:     supportUrl,
+		PrivacyUrl:     privacyUrl,
+		OnlineAt:       -1,
+		OfflineAt:      -1,
+		UserAccountMax: userAccountMax,
+		UserTokenMax:   userTokenMax,
+		Enable:         enable,
+		LatestVCodes:   map[int]map[int]map[int]int{},
+		StatsList:      map[int]int{},
 	}
 }
 
@@ -86,11 +77,11 @@ func (c *Client) IsComingOffline() bool {
 }
 
 func (c *Client) GetVersionCode(area, platform, market int) int {
-	if _, ok := c.LatestVersionCodes[area]; !ok {
+	if _, ok := c.LatestVCodes[area]; !ok {
 		return 0
 	}
-	if _, ok := c.LatestVersionCodes[area][platform]; !ok {
+	if _, ok := c.LatestVCodes[area][platform]; !ok {
 		return 0
 	}
-	return c.LatestVersionCodes[area][platform][market]
+	return c.LatestVCodes[area][platform][market]
 }

@@ -19,12 +19,8 @@ type ClientVersion struct {
 	PageUrl string   `json:"pageUrl"` // 产品页面 (方便控制台跳转)
 	Enable  bool     `json:"enable"`  // 是否可用 (和Client.enable一样但不冲突)
 
-	PublishAt int64 `json:"publishAt"` // 发布时间 (不是审核时间)
-	Watched   int   `json:"watched"`   // 总查看数量 (整点更新)
-	Download  int   `json:"download"`  // 总下载数量 (整点更新)
-	Opener    int   `json:"opener"`    // 总启动数量 (整点更新)
-	Score     int   `json:"score"`     // 当前总评分 (整点更新)
-	Comments  int   `json:"comments"`  // 当前总评数 (整点更新)
+	PublishAt int64       `json:"publishAt"` // 发布时间 (不是审核时间)
+	StatsList map[int]int `json:"statsList"` // [stats_kind]统计数据 (整点更新)
 }
 
 func NewClientVersion(
@@ -57,11 +53,7 @@ func NewClientVersion(
 		PageUrl:   pageUrl,
 		Enable:    enable,
 		PublishAt: -1,
-		Watched:   -1,
-		Download:  -1,
-		Opener:    -1,
-		Score:     -1,
-		Comments:  -1,
+		StatsList: map[int]int{},
 	}
 }
 
