@@ -1,0 +1,60 @@
+version: '3.7'
+
+services:
+  client:
+    build:
+      context: ../../..
+      dockerfile: deployments/docker/dev/client/Dockerfile
+    container_name: katydid_base_api-client
+    restart: always
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./logs:/app/logs
+#    environment:
+#      - ENV_VAR_NAME=value
+#      - DATABASE_URL=postgres://postgres:postgres@pgsql:5432/postgres
+#    healthcheck:
+#      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+#      interval: 30s
+#      timeout: 10s
+#      retries: 3
+#      start_period: 5s
+
+
+#version: '3.7'
+#
+#services:
+#  client:
+#    build: ./client/dev/
+##      context: .
+##      dockerfile: ./client/Dockerfile
+#    container_name: katydid_base_api-client
+#    restart: always
+#    ports:
+#      - "8080:8080"
+#    volumes:
+#      - ./logs:/app/logs/client/
+##      - /deployments/docker/client:/app/client
+##    depends_on:
+##      - pgsql
+##      - redis
+##    environment:
+##      - ENV_VAR_NAME=value
+##      - DATABASE_URL=postgres://postgres:postgres@pgsql:5432/postgres
+#
+##  pgsql:
+##    image: postgres:17
+##    container_name: pgsql
+##    environment:
+##      POSTGRES_USER: postgres
+##      POSTGRES_PASSWORD: postgres
+##      POSTGRES_DB: postgres
+##    ports:
+##      - "5432:5432"
+##
+##  redis:
+##    image: redis:7.0
+##    container_name: redis
+##    ports:
+##      - "6379:6379"
