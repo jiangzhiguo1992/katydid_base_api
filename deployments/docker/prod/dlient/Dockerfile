@@ -52,4 +52,4 @@ ENTRYPOINT ["/app/main"]
 # start-period=5s 容器启动后5秒后开始检查#
 # retries=3 检查失败后重试3次
 # 这里是检查应用程序的 /health 端点，如果返回状态码不是200，容器就会退出，这样k8s就会重启容器
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD curl -f http://localhost:8080/health || exit 1 CMD curl -f http://localhost:8080/health || exit 1| exit 1
+#HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 CMD curl -f http://localhost:8080/health || exit 1 CMD curl -f http://localhost:8080/health || exit 1| exit 1

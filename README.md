@@ -1,21 +1,35 @@
 # katydid_base_api
-katydid base api
 
-#### 构建单个镜像(Dockerfile) (katydid_base_api-client替换为自己的docker镜像名称)
+katydid_base_api 是一个基于 __golang__ 的 __api__ 项目，用于快速搭建api项目的环境，提供了一些基础的功能，功能如下：
+
+- 1.__版本控制+统计系统__
+- 2.__用户认证+权限+统计系统__
+- 3.__账号认证+权限+统计系统__
+- 4.__公共消息(公告+客服)系统__
+- 5.__支付系统__
+- 6.__日志系统__
+
+## 运行项目可执行如下操作
+### 1. 首先是构建镜像
+#### 1.构建单个镜像 Dockerfile (可以跳过，直接进行第2步)
 #### dev:
 ```shell
-    docker build -f deployments/docker/dev/client/Dockerfile -t  katydid_base_api-client_dev.
+    docker build -f deployments/docker/dev/client/Dockerfile -t  katydid_base_api-client_dev .
 ```
 #### pro:
 ```shell
     docker build -f deployments/docker/prod/client/Dockerfile -t katydid_base_api-client_prod .
 ```
-#### 构建组合镜像(docker-compose.yml)
+- -f是指定的Dockerfile文件位置， -t是指定的镜像名称，其中 katydid_base_api-client 替换为自己的docker镜像名称
+
+#### 2.构建组合镜像 docker-compose.yml
 #### dev:
 ```shell
-    docker-compose -f deployments/docker/dev/docker-compose.yml build
+    docker-compose -f deployments/docker/dev/docker-compose.yml up
 ```
 #### prod:
 ```shell
-    docker-compose -f deployments/docker/prod/docker-compose.yml build
+    docker-compose -f deployments/docker/pord/docker-compose.yml up
 ```
+- -f是指定的docker-compose.yml文件位置
+
