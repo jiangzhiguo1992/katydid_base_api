@@ -25,14 +25,13 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # 复制当前目录下的所有源代码到工作目录(/app)，类似cp命令
-#COPY cmd ./cmd (其实这个也行，只复制main相关文件进去)
+#COPY cmd ./cmd #(其实这个也行，只复制main相关文件进去)
 COPY . .
 
 # 构建 Go 应用程序，cmd目录下的man函数，构建二进制文件(-o)名称为main，构建完成后，main文件会在docker的/app目录下
 RUN go build -o main ./cmd
 
 # 从 scratch 镜像开始一个新的阶段构建镜像，这个阶段不包含任何构建环境，只包含了应用程序运行所需的依赖，后续的操作都是在scratch(基础镜像)镜像上进行的
-#ubuntu:24.04 # (正式环境下就是ubuntu，就不用下载了)
 FROM scratch
 
 # 从前一个阶段复制预构建的二进制文件到新的镜像中，这样就不会包含构建工具和源代码，使镜像更加轻量
