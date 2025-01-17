@@ -19,6 +19,10 @@ func InitLogger(prod bool) {
 	// production config
 	cfg := zap.NewProductionConfig()
 	cfg.Development = !prod
+	cfg.Sampling = &zap.SamplingConfig{
+		Initial:    100,
+		Thereafter: 100,
+	}
 	if prod {
 		cfg.Level = zap.NewAtomicLevelAt(zap.InfoLevel)
 		cfg.Encoding = "json"
@@ -26,15 +30,15 @@ func InitLogger(prod bool) {
 		cfg.Level = zap.NewAtomicLevelAt(zap.DebugLevel)
 		cfg.Encoding = "console"
 	}
-	cfg.Sampling = &zap.SamplingConfig{
-		Initial:    100,
-		Thereafter: 100,
-	}
 
-	// encoder config
+	// encoder
 	encodeCfg := zap.NewProductionEncoderConfig()
-	encodeCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
 	encodeCfg.EncodeTime = zapcore.ISO8601TimeEncoder
+	if prod {
+		encodeCfg.LevelKey = ""
+	} else {
+		encodeCfg.EncodeLevel = zapcore.CapitalColorLevelEncoder
+	}
 	cfg.EncoderConfig = encodeCfg
 	var encoder zapcore.Encoder
 	if prod {
@@ -43,23 +47,55 @@ func InitLogger(prod bool) {
 		encoder = zapcore.NewConsoleEncoder(encodeCfg)
 	}
 
+	// writer
+	infoDir := path.Join("logs", "info")
+	warnDir := path.Join("logs", "warn")
+	errDir := path.Join("logs", "err")
+	pacDir := path.Join("logs", "pac")
+	fatDir := path.Join("logs", "fat")
+	err := CreateDir(infoDir)
+	if err != nil {
+		panic(err)
+	}
+	err = CreateDir(warnDir)
+	if err != nil {
+		panic(err)
+	}
+	err = CreateDir(errDir)
+	if err != nil {
+		panic(err)
+	}
+	err = CreateDir(pacDir)
+	if err != nil {
+		panic(err)
+	}
+	err = CreateDir(fatDir)
+	if err != nil {
+		panic(err)
+	}
+	infoWriteSyncer := &dateWriteSyncer{outPath: infoDir}
+	warnWriteSyncer := &dateWriteSyncer{outPath: warnDir}
+	errWriteSyncer := &dateWriteSyncer{outPath: errDir}
+	pacWriteSyncer := &dateWriteSyncer{outPath: pacDir}
+	fatWriteSyncer := &dateWriteSyncer{outPath: fatDir}
+
 	// core
-	infoWriteSyncer := &dateWriteSyncer{outPath: path.Join("logs", "info")}
-	errWriteSyncer := &dateWriteSyncer{outPath: path.Join("logs", "error")}
-	pacWriteSyncer := &dateWriteSyncer{outPath: path.Join("logs", "panic")}
-	fatWriteSyncer := &dateWriteSyncer{outPath: path.Join("logs", "fatal")}
 	core := zapcore.NewTee(
 		// info
 		zapcore.NewCore(encoder, zapcore.AddSync(infoWriteSyncer), zap.LevelEnablerFunc(func(lv zapcore.Level) bool {
-			return lv < zapcore.ErrorLevel
+			return lv < zapcore.WarnLevel
+		})),
+		// warn
+		zapcore.NewCore(encoder, zapcore.AddSync(warnWriteSyncer), zap.LevelEnablerFunc(func(lv zapcore.Level) bool {
+			return (lv >= zapcore.WarnLevel) && (lv < zapcore.ErrorLevel)
 		})),
 		// error
 		zapcore.NewCore(encoder, zapcore.AddSync(errWriteSyncer), zap.LevelEnablerFunc(func(lv zapcore.Level) bool {
-			return (lv >= zapcore.ErrorLevel) && (lv < zapcore.PanicLevel)
+			return (lv >= zapcore.ErrorLevel) && (lv < zapcore.DPanicLevel)
 		})),
 		// panic
 		zapcore.NewCore(encoder, zapcore.AddSync(pacWriteSyncer), zap.LevelEnablerFunc(func(lv zapcore.Level) bool {
-			return (lv >= zapcore.PanicLevel) && (lv < zapcore.FatalLevel)
+			return (lv >= zapcore.DPanicLevel) && (lv < zapcore.FatalLevel)
 		})),
 		// fatal
 		zapcore.NewCore(encoder, zapcore.AddSync(fatWriteSyncer), zap.LevelEnablerFunc(func(lv zapcore.Level) bool {
@@ -120,6 +156,10 @@ func Warn(msg string, fields ...zap.Field) {
 
 func Error(msg string, fields ...zap.Field) {
 	logger.Error(msg, fields...)
+}
+
+func Panic(msg string, fields ...zap.Field) {
+	logger.Panic(msg, fields...)
 }
 
 func Fatal(msg string, fields ...zap.Field) {
