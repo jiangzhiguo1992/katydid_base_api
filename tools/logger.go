@@ -1,11 +1,11 @@
-package utils
+package tools
 
 import (
 	"context"
 	"log/slog"
 )
 
-func Init() {
+func InitLogger() {
 	// TODO:GG 初始化配置
 }
 

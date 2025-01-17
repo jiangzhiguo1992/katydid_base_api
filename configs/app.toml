@@ -1,0 +1,9 @@
+# client
+[client]
+prod = false
+remote = false
+name = "client"
+
+[user]
+prod = true
+remote = true

@@ -1,0 +1,43 @@
+############################################# PgSql #############################################
+
+[pgsql]
+name = "要被覆盖!"
+port = 5432
+sslmode = "disable"
+TimeZone = "Asia/Shanghai"
+
+[pgsql.local]
+name = "本地"
+host = "127.0.0.1"
+user = "jiang"
+pwd = "laojiang1"
+
+[pgsql.cloud]
+name = "远程"
+host = "169.2.14.1"
+user = "root"
+pwd = "2ud8scsdc"
+
+[pgsql.dev]
+name = "测试"
+db_name = "postgres_test"
+
+[pgsql.prod]
+name = "生产"
+db_name = "postgres"
+
+[pgsql.local.dev]
+name = "本地.测试"
+
+[pgsql.local.prod]
+name = "本地.生产"
+
+[pgsql.cloud.dev]
+name = "远程.测试"
+
+[pgsql.cloud.prod]
+name = "远程.生产"
+
+############################################# Redis #############################################
+
+[redis]
