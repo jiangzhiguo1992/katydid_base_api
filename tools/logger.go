@@ -1,6 +1,8 @@
 package tools
 
 import (
+	"errors"
+	"fmt"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"os"
@@ -38,25 +40,20 @@ func InitLogger(prod bool) {
 		errDir := path.Join("logs", "err")
 		pacDir := path.Join("logs", "pac")
 		fatDir := path.Join("logs", "fat")
-		err := CreateDir(infoDir)
-		if err != nil {
-			panic(err)
+		if err := os.MkdirAll(infoDir, os.ModePerm); err != nil {
+			panic(errors.New(fmt.Sprintf("failed to create log_info_dir %s: %s", infoDir, err)))
 		}
-		err = CreateDir(warnDir)
-		if err != nil {
-			panic(err)
+		if err := os.MkdirAll(warnDir, os.ModePerm); err != nil {
+			panic(errors.New(fmt.Sprintf("failed to create log_warn_dir %s: %s", warnDir, err)))
 		}
-		err = CreateDir(errDir)
-		if err != nil {
-			panic(err)
+		if err := os.MkdirAll(errDir, os.ModePerm); err != nil {
+			panic(errors.New(fmt.Sprintf("failed to create log_err_dir %s: %s", errDir, err)))
 		}
-		err = CreateDir(pacDir)
-		if err != nil {
-			panic(err)
+		if err := os.MkdirAll(pacDir, os.ModePerm); err != nil {
+			panic(errors.New(fmt.Sprintf("failed to create log_pac_dir %s: %s", pacDir, err)))
 		}
-		err = CreateDir(fatDir)
-		if err != nil {
-			panic(err)
+		if err := os.MkdirAll(fatDir, os.ModePerm); err != nil {
+			panic(errors.New(fmt.Sprintf("failed to create log_fat_dir %s: %s", fatDir, err)))
 		}
 		infoWriteSyncer := &dateWriteSyncer{outPath: infoDir}
 		warnWriteSyncer := &dateWriteSyncer{outPath: warnDir}
@@ -100,6 +97,7 @@ func InitLogger(prod bool) {
 			Initial:    100,
 			Thereafter: 100,
 		}
+		cfg.DisableCaller = true
 		cfg.EncoderConfig = encodeCfg
 
 		// logger

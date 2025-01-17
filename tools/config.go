@@ -5,7 +5,6 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 	"log"
-	"log/slog"
 	"strings"
 )
 
@@ -24,7 +23,7 @@ func InitConfig(cloud bool, configs [][3]string) {
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
 		// TODO:GG 配置会被更新，这里要做一些相关的re_init操作
-		slog.Debug("config file changed", "name", e.Name)
+		fmt.Printf("config file changed name:%s\n", e.Name)
 	})
 }
 
