@@ -29,8 +29,8 @@ go.work.sum
 .vscode
 
 # configs
-cloud.toml
-secret.toml
+/configs/cloud/
+/configs/secret/
 
 # logs
-/logs
+/logs/

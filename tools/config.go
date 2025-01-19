@@ -5,38 +5,126 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 	"log"
+	"path/filepath"
 )
 
-func InitConfigStarts(configs map[string][][2]string, cloudKey, prodKey string) (bool, bool) {
-	for dir, files := range configs {
-		for _, f := range files {
-			setUpConfig(dir, f[0], f[1])
-		}
-	}
-	cloud, prod := viper.GetBool(cloudKey), viper.GetBool(prodKey)
-	return cloud, prod
-}
+const (
+	configsDir = "./configs"
 
-func InitConfigEnds(configs map[string][][2]string) {
-	for dir, files := range configs {
-		for _, f := range files {
-			setUpConfig(dir, f[0], f[1])
+	ModuleCloudKey = "module.cloud"
+	ModuleProdKey  = "module.prod"
+
+	InitKey   = "init"
+	CommonKey = "common"
+	LocalKey  = "local"
+	CloudKey  = "cloud"
+	SecretKey = "secret"
+)
+
+func InitConfigs() (bool, bool) {
+	mapFiles := getConfigsFiles()
+
+	for _, f := range mapFiles[InitKey] {
+		setUpConfig(false, f[0], f[1], f[2])
+	}
+
+	for _, f := range mapFiles[CommonKey] {
+		setUpConfig(true, f[0], f[1], f[2])
+	}
+
+	cloud, prod := viper.GetBool(ModuleCloudKey), viper.GetBool(ModuleProdKey)
+	if cloud {
+		for _, f := range mapFiles[CloudKey] {
+			setUpConfig(true, f[0], f[1], f[2])
+		}
+	} else {
+		for _, f := range mapFiles[LocalKey] {
+			setUpConfig(true, f[0], f[1], f[2])
 		}
 	}
+
+	for _, f := range mapFiles[SecretKey] {
+		setUpConfig(true, f[0], f[1], f[2])
+	}
+
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
 		// TODO:GG 配置会被更新，这里要做一些相关的re_init操作
 		fmt.Printf("config file changed name:%s\n", e.Name)
 	})
+	return cloud, prod
 }
 
-func setUpConfig(path, name, suffix string) {
-	fmt.Printf("加载配置, path:%s%s.%s\n", path, name, suffix)
+func getConfigsFiles() map[string][][3]string {
+	// init
+	initFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.toml", configsDir, InitKey))
+	if err != nil {
+		panic(err)
+	}
+	initParams := splitFiles(initFiles)
+
+	// common
+	commonFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.toml", configsDir, CommonKey))
+	if err != nil {
+		panic(err)
+	}
+	commonParams := splitFiles(commonFiles)
+
+	// local
+	localFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.toml", configsDir, LocalKey))
+	if err != nil {
+		panic(err)
+	}
+	localParams := splitFiles(localFiles)
+
+	// cloud (ignore)
+	cloudFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.toml", configsDir, CloudKey))
+	if err != nil {
+		panic(err)
+	}
+	cloudParams := splitFiles(cloudFiles)
+
+	// secret (ignore)
+	secretFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.toml", configsDir, SecretKey))
+	if err != nil {
+		panic(err)
+	}
+	secretParams := splitFiles(secretFiles)
+
+	return map[string][][3]string{
+		InitKey:   initParams,
+		CommonKey: commonParams,
+		LocalKey:  localParams,
+		CloudKey:  cloudParams,
+		SecretKey: secretParams,
+	}
+}
+
+func splitFiles(files []string) [][3]string {
+	var params [][3]string
+	for _, file := range files {
+		dir := filepath.Dir(file)
+		name := filepath.Base(file)
+		ext := filepath.Ext(file)
+		name = name[:len(name)-len(ext)]
+		params = append(params, [3]string{dir, name, ext[1:]})
+	}
+	return params
+}
+
+func setUpConfig(merge bool, path, name, suffix string) {
+	fmt.Printf("加载配置, path:%s/%s.%s\n", path, name, suffix)
 	viper.AddConfigPath(path)
 	viper.SetConfigName(name)
 	viper.SetConfigType(suffix)
-	if err := viper.MergeInConfig(); err != nil {
-		log.Fatalf("read config failed: %v", err)
+	if merge {
+		if err := viper.MergeInConfig(); err != nil {
+			log.Fatalf("merge config failed: %v", err)
+		}
+	} else {
+		if err := viper.ReadInConfig(); err != nil {
+			log.Fatalf("read config failed: %v", err)
+		}
 	}
 }
 
@@ -46,7 +134,7 @@ func InitConfigsRemotes() {
 
 func ConfigEnvKey(prod bool, tag, key string) string {
 	if len(tag) <= 0 {
-		panic(fmt.Sprintf("donfig tag is empty: %s", tag))
+		panic(fmt.Sprintf("config tag is empty: %s", tag))
 	}
 
 	// env
@@ -68,5 +156,5 @@ func ConfigEnvKey(prod bool, tag, key string) string {
 			return name
 		}
 	}
-	panic(fmt.Sprintf("donfig not found tag.key: %s%s", tag, key))
+	panic(fmt.Sprintf("config not found tag.key: %s%s", tag, key))
 }

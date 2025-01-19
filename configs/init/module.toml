@@ -1,21 +1,18 @@
 ############################################# 模块 #############################################
 
-name = "基层api"
+[module]
 enable = false
 cloud = true
 prod = true
 
-[client]
-name = "client"
+[module.client]
+enable = true
+prod = true
+
+[module.user]
 enable = true
 prod = false
 
-[user]
-name = "user"
-enable = true
-prod = false
-
-[account]
-name = "account"
+[module.account]
 enable = true
 prod = false
