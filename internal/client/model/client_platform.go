@@ -14,16 +14,16 @@ const (
 )
 
 const (
-	LinkTYpeEmail     = 1
-	LinkTYpePhone     = 2
-	LinkTYpeQQ        = 3
-	LinkTYpeWeChat    = 4
-	LinkTYpeWeibo     = 5
-	LinkTYpeFacebook  = 6
-	LinkTYpeTwitter   = 7
-	LinkTYpeInstagram = 8
-	LinkTYpeYouTube   = 9
-	LinkTYpeTikTok    = 10
+	LinkTypeEmail     = 1
+	LinkTypePhone     = 2
+	LinkTypeQQ        = 3
+	LinkTypeWeChat    = 4
+	LinkTypeWeibo     = 5
+	LinkTypeFacebook  = 6
+	LinkTypeTwitter   = 7
+	LinkTypeInstagram = 8
+	LinkTypeYouTube   = 9
+	LinkTypeTikTok    = 10
 )
 
 // ClientPlatform 客户端平台
@@ -43,7 +43,7 @@ type ClientPlatform struct {
 
 	Extra map[string]interface{} `json:"extra"` // 额外信息
 
-	LatestVersion map[int]int `json:"latestVersion"` // [market]最新publish版本号
+	LatestVersion map[int]*ClientVersion `json:"latestVersion"` // [market]最新publish版本号
 }
 
 func NewClientPlatform(
@@ -59,7 +59,7 @@ func NewClientPlatform(
 		AppId: appId, AppMarket: appMarket, Links: links,
 		OnlineAt: onlineAt, OfflineAt: offlineAt, Enable: enable,
 		Extra:         extra,
-		LatestVersion: map[int]int{},
+		LatestVersion: map[int]*ClientVersion{},
 	}
 }
 
@@ -97,9 +97,9 @@ func (c *ClientPlatform) IsComingOffline() bool {
 	return c.OfflineAt > currentTime && (c.OnlineAt == -1 || c.OnlineAt < currentTime)
 }
 
-func (c *ClientPlatform) GetLatestVersion(market int) int {
+func (c *ClientPlatform) GetLatestVersion(market int) *ClientVersion {
 	if v, ok := c.LatestVersion[market]; ok {
 		return v
 	}
-	return -1
+	return nil
 }
