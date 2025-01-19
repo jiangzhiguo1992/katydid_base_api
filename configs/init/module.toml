@@ -1,18 +1,15 @@
 ############################################# 模块 #############################################
 
 [module]
-enable = false
-cloud = true
-prod = true
+enable = true
+cloud = false
+prod = false
 
 [module.client]
-enable = true
-prod = true
+prod = false
 
 [module.user]
-enable = true
 prod = false
 
 [module.account]
-enable = true
 prod = false

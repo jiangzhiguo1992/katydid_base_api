@@ -25,7 +25,7 @@ const (
 	MarketTypeNokia      = 18
 	MarketTypeMotorola   = 19
 	MarketTypeOnePlus    = 20
-	// TODO:GG 还会有渠道投放，所以可以从conf读取？
+	// TODO:GG 还会有渠道投放，动态的，所以会从conf读取？
 )
 
 // ClientVersion 客户端版本
