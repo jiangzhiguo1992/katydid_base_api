@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 )
 
+// DirCreate 创建目录
 func DirCreate(path string) error {
 	if err := os.MkdirAll(path, os.ModePerm); err != nil {
 		return errors.New(fmt.Sprintf("failed to create dir %s: %s", path, err))
@@ -14,6 +15,7 @@ func DirCreate(path string) error {
 	return nil
 }
 
+// FileCreate 创建文件
 func FileCreate(path string) (*os.File, error) {
 	// dir
 	err := DirCreate(filepath.Dir(path))
@@ -28,6 +30,7 @@ func FileCreate(path string) (*os.File, error) {
 	return file, nil
 }
 
+// FileSizeFormat 文件大小格式化
 func FileSizeFormat(size int64) string {
 	const (
 		KB = 1024

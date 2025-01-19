@@ -22,6 +22,7 @@ const (
 	ModuleProdKey   = "module.prod"
 )
 
+// InitConfigs 初始化配置
 func InitConfigs() (bool, bool) {
 	mapFiles := getConfigsFiles()
 	var settings map[string]any
@@ -64,6 +65,7 @@ func InitConfigs() (bool, bool) {
 	return cloud, prod
 }
 
+// getConfigsFiles 获取配置文件
 func getConfigsFiles() map[string][][3]string {
 	// init
 	initFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.toml", configsDir, InitKey))
@@ -109,6 +111,7 @@ func getConfigsFiles() map[string][][3]string {
 	}
 }
 
+// splitFiles 分割文件
 func splitFiles(files []string) [][3]string {
 	var params [][3]string
 	for _, file := range files {
@@ -121,6 +124,7 @@ func splitFiles(files []string) [][3]string {
 	return params
 }
 
+// setUpConfig 设置配置
 func setUpConfig(merge bool, path, name, suffix string) map[string]any {
 	fmt.Printf("加载配置, path:%s/%s.%s\n", path, name, suffix)
 	viper.AddConfigPath(path)
@@ -138,10 +142,12 @@ func setUpConfig(merge bool, path, name, suffix string) map[string]any {
 	return viper.AllSettings()
 }
 
+// InitConfigsRemotes 初始化远程配置
 func InitConfigsRemotes() {
 	// TODO:GG 远程配置
 }
 
+// ConfigEnvKey 获取配置环境变量
 func ConfigEnvKey(prod bool, tag, key string) string {
 	if len(tag) <= 0 {
 		panic(fmt.Sprintf("config tag is empty: %s", tag))

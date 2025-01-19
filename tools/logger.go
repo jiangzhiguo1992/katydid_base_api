@@ -21,6 +21,7 @@ var (
 	logger *zap.Logger
 )
 
+// InitLogger 初始化日志
 func InitLogger(prod bool) {
 	// encoder
 	encodeCfg := zap.NewProductionEncoderConfig()
@@ -113,6 +114,7 @@ func InitLogger(prod bool) {
 	}
 }
 
+// dateWriteSyncer 按日期写入日志
 type dateWriteSyncer struct {
 	file    *os.File
 	outPath string
@@ -139,6 +141,7 @@ func (d *dateWriteSyncer) Sync() error {
 	return nil
 }
 
+// LogExit 退出日志
 func LogExit() {
 	if logger == nil {
 		return
