@@ -30,11 +30,6 @@ func InitConfigEnds(configs map[string][][2]string) {
 	})
 }
 
-func InitConfigsRemotes() {
-	// TODO:GG 远程配置
-}
-
-// TODO:GG 修改
 func setUpConfig(path, name, suffix string) {
 	fmt.Printf("加载配置, path:%s%s.%s\n", path, name, suffix)
 	viper.AddConfigPath(path)
@@ -45,43 +40,33 @@ func setUpConfig(path, name, suffix string) {
 	}
 }
 
-func ConfigEnvKey(prod bool, module, tag, key string) string {
+func InitConfigsRemotes() {
+	// TODO:GG 远程配置
+}
+
+func ConfigEnvKey(prod bool, tag, key string) string {
 	if len(tag) <= 0 {
-		panic(fmt.Sprintf("key1 is empty: %s", tag))
+		panic(fmt.Sprintf("donfig tag is empty: %s", tag))
 	}
 
-	// suffix_1
-	suffix1 := ""
-	if len(module) > 0 {
-		suffix1 = fmt.Sprintf(".%s", module)
+	// env
+	suffix := "prod"
+	if !prod {
+		suffix = "dev"
 	}
-	var suffix1s []string
-	if len(suffix1) > 0 {
-		suffix1s = []string{suffix1, ""}
-	} else {
-		suffix1s = []string{""}
-	}
-
-	// suffix_2
-	suffix2 := "dev"
-	if prod {
-		suffix2 = "prod"
-	}
-	suffix2s := [2]string{fmt.Sprintf(".%s", suffix2), ""}
+	suffixs := [2]string{fmt.Sprintf(".%s", suffix), ""}
 
 	// key
 	if len(key) > 0 {
 		key = fmt.Sprintf(".%s", key)
 	}
 
-	for n := 0; n < len(suffix1s); n++ {
-		for i := 0; i < len(suffix2s); i++ {
-			t := fmt.Sprintf("%s%s%s", tag, suffix1s[n], suffix2s[i])
-			name := fmt.Sprintf("%s%s", t, key)
-			if viper.IsSet(name) {
-				return name
-			}
+	for i := 0; i < len(suffixs); i++ {
+		t := fmt.Sprintf("%s%s", tag, suffixs[i])
+		name := fmt.Sprintf("%s%s", t, key)
+		if viper.IsSet(name) {
+			return name
 		}
 	}
-	panic(fmt.Sprintf("not found key: %s.%s", tag, key))
+	panic(fmt.Sprintf("donfig not found tag.key: %s%s", tag, key))
 }
