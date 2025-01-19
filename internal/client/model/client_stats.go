@@ -11,8 +11,8 @@ const (
 	ClientStatsKindActiveU  = 8 // 登录(包括首次+去重)
 	ClientStatsKindScore    = 9 // 评分 (评论放链接里点击)
 
-	ClientStatsKindDuration1   = 10 // 在线时长 (min)
-	ClientStatsKindDuration5   = 11 // 在线时长 (min)
+	ClientStatsKindDuration0   = 10 // 在线时长 (min)
+	ClientStatsKindDuration3   = 11 // 在线时长 (min)
 	ClientStatsKindDuration10  = 12 // 在线时长 (min)
 	ClientStatsKindDuration30  = 13 // 在线时长 (min)
 	ClientStatsKindDuration60  = 14 // 在线时长 (min)
@@ -32,45 +32,41 @@ const (
 	ClientStatsKindPayMoney128 = 27 // 付费金额 (元)
 	ClientStatsKindPayMoney328 = 28 // 付费金额 (元)
 	ClientStatsKindPayMoney648 = 29 // 付费金额 (元)
+
+	// TODO:GG 还有很多可以加？都要放进来吗?
 )
 
 // ClientStats 客户端统计量
 type ClientStats struct {
 	*Base
-	Cid   int64 `json:"cid"`   // 客户端id
-	CVid  int64 `json:"cvid"`  // 客户端版本id
-	Kind  int   `json:"kind"`  // 类型
-	Year  int   `json:"year"`  // 年
-	Month int   `json:"month"` // 月
-	Week  int   `json:"week"`  // 周 (和月冲突)
-	Day   int   `json:"day"`   // 日
-	Hour  int   `json:"hour"`  // 时
+	IP       int `json:"IP"`       // 系列 (eg:大富翁IP)
+	Part     int `json:"part"`     // 类型 (eg:单机版)
+	Area     int `json:"area"`     // 区域编号 (从conf读取，不一定是国家或洲际)
+	Platform int `json:"platform"` // 平台
+	Market   int `json:"market"`   // 渠道
+	Code     int `json:"code"`     // 版本标识
+	Kind     int `json:"kind"`     // 类型
+	Year     int `json:"year"`     // 年
+	Month    int `json:"month"`    // 月
+	Week     int `json:"week"`     // 周 (和月冲突)
+	Day      int `json:"day"`      // 日
+	Hour     int `json:"hour"`     // 时
 
 	Num int `json:"num"` // 数量
 }
 
 func NewClientStats(
 	base *Base,
-	cid int64,
-	cvid int64,
+	IP int, part int, area int, platform int, market int, code int,
 	kind int,
-	year int,
-	month int,
-	week int,
-	day int,
-	hour int,
+	year int, month int, week int, day int, hour int,
 	num int,
 ) *ClientStats {
 	return &ClientStats{
-		Base:  base,
-		Cid:   cid,
-		CVid:  cvid,
-		Kind:  kind,
-		Year:  year,
-		Month: month,
-		Week:  week,
-		Day:   day,
-		Hour:  hour,
-		Num:   num,
+		Base: base,
+		IP:   IP, Part: part, Area: area, Platform: platform, Market: market, Code: code,
+		Kind: kind,
+		Year: year, Month: month, Week: week, Day: day, Hour: hour,
+		Num: num,
 	}
 }

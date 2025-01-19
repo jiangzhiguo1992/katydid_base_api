@@ -4,11 +4,35 @@ import (
 	"time"
 )
 
+const (
+	MarketTypeGooglePlay = 1
+	MarketTypeAppStore   = 2
+	MarketTypeHuawei     = 3
+	MarketTypeXiaomi     = 4
+	MarketTypeOppo       = 5
+	MarketTypeVivo       = 6
+	MarketTypeTencent    = 7
+	MarketTypeBaidu      = 8
+	MarketType360        = 9
+	MarketTypeMeizu      = 10
+	MarketTypeCoolpad    = 11
+	MarketTypeLenovo     = 12
+	MarketTypeZTE        = 13
+	MarketTypeSamsung    = 14
+	MarketTypeSony       = 15
+	MarketTypeLG         = 16
+	MarketTypeHTC        = 17
+	MarketTypeNokia      = 18
+	MarketTypeMotorola   = 19
+	MarketTypeOnePlus    = 20
+	// TODO:GG 还会有渠道投放，所以可以从conf读取？
+)
+
 // ClientVersion 客户端版本
 type ClientVersion struct {
 	*Base
 	CPid   int64 `json:"cpid"`   // 客户端平台id
-	Market int   `json:"market"` // 渠道
+	Market int   `json:"market"` // 市场/渠道 (从conf读)
 	Code   int   `json:"code"`   // 版本标识
 
 	AppName   string `json:"appName"`   // app名称
@@ -27,7 +51,7 @@ type ClientVersion struct {
 	PublishAt int64 `json:"publishAt"` // 发布时间 (不是审核时间)
 	Enable    bool  `json:"enable"`    // 是否可用 (没有reason)
 
-	Extra map[string]interface{} `json:"extra"` // 额外信息 (例如ios_id...)
+	Extra map[string]interface{} `json:"extra"` // 额外信息
 }
 
 func NewClientVersion(
@@ -54,4 +78,18 @@ func (c *ClientVersion) IsBuild() bool {
 
 func (c *ClientVersion) IsPublish() bool {
 	return c.PublishAt > time.Now().Unix()
+}
+
+func (c *ClientVersion) SetIosId(iosId string) {
+	if c.Extra == nil {
+		c.Extra = map[string]interface{}{}
+	}
+	c.Extra["ios_id"] = iosId
+}
+
+func (c *ClientVersion) GetIosId() string {
+	if c.Extra == nil || c.Extra["ios_id"] == nil {
+		return ""
+	}
+	return c.Extra["ios_id"].(string)
 }
