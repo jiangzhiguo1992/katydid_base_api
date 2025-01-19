@@ -26,14 +26,16 @@ type ModuleConfig struct {
 }
 
 type PgSqlConfig struct {
-	Host     string `mapstructure:"host"`
-	Port     string `mapstructure:"port"`
-	Database string `mapstructure:"database"`
-	User     string `mapstructure:"user"`
-	Pwd      string `mapstructure:"pwd"`
-	Timeout  int    `mapstructure:"timeout"`
-	TimeZone string `mapstructure:"time_zone"`
-	SSLMode  string `mapstructure:"ssl_mode"`
+	Host       string `mapstructure:"host"`
+	Port       string `mapstructure:"port"`
+	Database   string `mapstructure:"database"`
+	User       string `mapstructure:"user"`
+	Pwd        string `mapstructure:"pwd"`
+	Timeout    int    `mapstructure:"timeout"`
+	TimeZone   string `mapstructure:"timezone"`
+	SSLMode    string `mapstructure:"sslMode"`
+	MaxRetries int    `mapstructure:"maxRetries"`
+	RetryDelay int    `mapstructure:"retryDelay"`
 }
 
 type RedisConfig struct {
@@ -109,7 +111,14 @@ func newPgSql(prod bool, module string) *PgSqlConfig {
 	pgsql.Timeout = viper.GetInt(timeout)
 	timeZone := tools.ConfigEnvKey(prod, tag, "timezone")
 	pgsql.TimeZone = viper.GetString(timeZone)
-	sslMode := tools.ConfigEnvKey(prod, tag, "sslmode")
+	sslMode := tools.ConfigEnvKey(prod, tag, "sslMode")
 	pgsql.SSLMode = viper.GetString(sslMode)
+	maxRetries := tools.ConfigEnvKey(prod, tag, "maxRetries")
+	pgsql.MaxRetries = viper.GetInt(maxRetries)
+	if pgsql.MaxRetries <= 0 {
+		pgsql.MaxRetries = 1
+	}
+	retryDelay := tools.ConfigEnvKey(prod, tag, "retryDelay")
+	pgsql.RetryDelay = viper.GetInt(retryDelay)
 	return pgsql
 }

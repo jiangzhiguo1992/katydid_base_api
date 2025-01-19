@@ -8,7 +8,9 @@ user = "jiang"
 pwd = ""
 timeout = 10
 timezone = "Asia/Shanghai"
-sslmode = "disable"
+sslMode = "disable"
+maxRetries = 5
+retryDelay = 2
 
 [client.pgsql.dev]
 
