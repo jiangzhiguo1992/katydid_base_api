@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"log/slog"
 	"os"
 	"path"
 	"path/filepath"
@@ -136,29 +137,56 @@ func (d *dateWriteSyncer) Sync() error {
 }
 
 func LogExit() {
+	if logger == nil {
+		return
+	}
 	_ = logger.Sync()
 }
 
 func Debug(msg string, fields ...zap.Field) {
+	if logger == nil {
+		slog.Debug(msg)
+		return
+	}
 	logger.Debug(msg, fields...)
 }
 
 func Info(msg string, fields ...zap.Field) {
+	if logger == nil {
+		slog.Info(msg)
+		return
+	}
 	logger.Info(msg, fields...)
 }
 
 func Warn(msg string, fields ...zap.Field) {
+	if logger == nil {
+		slog.Warn(msg)
+		return
+	}
 	logger.Warn(msg, fields...)
 }
 
 func Error(msg string, fields ...zap.Field) {
+	if logger == nil {
+		slog.Error(msg)
+		return
+	}
 	logger.Error(msg, fields...)
 }
 
 func Panic(msg string, fields ...zap.Field) {
+	if logger == nil {
+		slog.Error(msg)
+		return
+	}
 	logger.Panic(msg, fields...)
 }
 
 func Fatal(msg string, fields ...zap.Field) {
+	if logger == nil {
+		slog.Error(msg)
+		return
+	}
 	logger.Fatal(msg, fields...)
 }

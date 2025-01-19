@@ -5,20 +5,23 @@ import (
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 	"log"
-	"strings"
 )
 
-func InitConfig(cloud bool, configs [][3]string) {
-	skipSuffix := "_cloud"
-	if cloud {
-		skipSuffix = "_local"
-	}
-	for _, config := range configs {
-		if strings.HasSuffix(config[1], skipSuffix) {
-			fmt.Printf("跳过配置, path:%s%s.%s\n", config[0], config[1], config[2])
-			continue
+func InitConfigStarts(configs map[string][][2]string, cloudKey, prodKey string) (bool, bool) {
+	for dir, files := range configs {
+		for _, f := range files {
+			setUpConfig(dir, f[0], f[1])
 		}
-		setUpConfig(config[0], config[1], config[2])
+	}
+	cloud, prod := viper.GetBool(cloudKey), viper.GetBool(prodKey)
+	return cloud, prod
+}
+
+func InitConfigEnds(configs map[string][][2]string) {
+	for dir, files := range configs {
+		for _, f := range files {
+			setUpConfig(dir, f[0], f[1])
+		}
 	}
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
@@ -27,37 +30,58 @@ func InitConfig(cloud bool, configs [][3]string) {
 	})
 }
 
+func InitConfigsRemotes() {
+	// TODO:GG 远程配置
+}
+
+// TODO:GG 修改
 func setUpConfig(path, name, suffix string) {
 	fmt.Printf("加载配置, path:%s%s.%s\n", path, name, suffix)
 	viper.AddConfigPath(path)
 	viper.SetConfigName(name)
 	viper.SetConfigType(suffix)
-	if err := viper.ReadInConfig(); err != nil {
-		if !strings.HasSuffix(name, "_cloud") {
-			log.Fatalf("read config failed: %v", err)
-		}
+	if err := viper.MergeInConfig(); err != nil {
+		log.Fatalf("read config failed: %v", err)
 	}
 }
 
-func ConfigEnvKey(prod bool, key1, key2 string) string {
-	if len(key1) <= 0 {
-		panic(fmt.Sprintf("key1 is empty: %s", key1))
-	}
-	suffix := "dev"
-	if prod {
-		suffix = "prod"
-	}
-	suffixs := [2]string{fmt.Sprintf(".%s", suffix), ""}
-	if len(key2) > 0 {
-		key2 = fmt.Sprintf(".%s", key2)
+func ConfigEnvKey(prod bool, module, tag, key string) string {
+	if len(tag) <= 0 {
+		panic(fmt.Sprintf("key1 is empty: %s", tag))
 	}
 
-	for i := 0; i < len(suffixs); i++ {
-		tag := fmt.Sprintf("%s%s", key1, suffixs[i])
-		key := fmt.Sprintf("%s%s", tag, key2)
-		if viper.IsSet(key) {
-			return key
+	// suffix_1
+	suffix1 := ""
+	if len(module) > 0 {
+		suffix1 = fmt.Sprintf(".%s", module)
+	}
+	var suffix1s []string
+	if len(suffix1) > 0 {
+		suffix1s = []string{suffix1, ""}
+	} else {
+		suffix1s = []string{""}
+	}
+
+	// suffix_2
+	suffix2 := "dev"
+	if prod {
+		suffix2 = "prod"
+	}
+	suffix2s := [2]string{fmt.Sprintf(".%s", suffix2), ""}
+
+	// key
+	if len(key) > 0 {
+		key = fmt.Sprintf(".%s", key)
+	}
+
+	for n := 0; n < len(suffix1s); n++ {
+		for i := 0; i < len(suffix2s); i++ {
+			t := fmt.Sprintf("%s%s%s", tag, suffix1s[n], suffix2s[i])
+			name := fmt.Sprintf("%s%s", t, key)
+			if viper.IsSet(name) {
+				return name
+			}
 		}
 	}
-	panic(fmt.Sprintf("not found key: %s.%s", key1, key2))
+	panic(fmt.Sprintf("not found key: %s.%s", tag, key))
 }

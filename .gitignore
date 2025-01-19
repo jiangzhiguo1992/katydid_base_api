@@ -28,8 +28,9 @@ go.work.sum
 .idea
 .vscode
 
-# cloud
-*_cloud.*
+# configs
+cloud.toml
+secret.toml
 
 # logs
-*.log
+/logs
