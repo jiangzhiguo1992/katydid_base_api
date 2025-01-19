@@ -1,0 +1,28 @@
+############################################# PgSql #############################################
+
+[client.pgsql]
+host = "localhost"
+port = 5432
+database = "postgres"
+user = "jiang"
+pwd = ""
+timeout = 10
+timezone = "Asia/Shanghai"
+sslmode = "disable"
+
+[client.pgsql.dev]
+
+[client.pgsql.prod]
+
+############################################# Redis #############################################
+
+[client.redis]
+host = ""
+port = 6379
+pwd = ""
+
+[client.oss]
+endpoint = ""
+access_key_id = ""
+access_key = ""
+

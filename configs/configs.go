@@ -26,12 +26,14 @@ type ModuleConfig struct {
 }
 
 type PgSqlConfig struct {
-	Name   string `mapstructure:"name"`
-	Host   string `mapstructure:"host"`
-	Port   string `mapstructure:"port"`
-	User   string `mapstructure:"user"`
-	Pwd    string `mapstructure:"pwd"`
-	DBName string `mapstructure:"db_name"`
+	Host     string `mapstructure:"host"`
+	Port     string `mapstructure:"port"`
+	Database string `mapstructure:"database"`
+	User     string `mapstructure:"user"`
+	Pwd      string `mapstructure:"pwd"`
+	Timeout  int    `mapstructure:"timeout"`
+	TimeZone string `mapstructure:"time_zone"`
+	SSLMode  string `mapstructure:"ssl_mode"`
 }
 
 type RedisConfig struct {
@@ -93,17 +95,21 @@ func newPgSql(prod bool, module string) *PgSqlConfig {
 	}
 	pgsql := &PgSqlConfig{}
 	tag := fmt.Sprintf("%s.pgsql", module)
-	name := tools.ConfigEnvKey(prod, tag, "name")
-	pgsql.Name = viper.GetString(name)
 	host := tools.ConfigEnvKey(prod, tag, "host")
 	pgsql.Host = viper.GetString(host)
 	port := tools.ConfigEnvKey(prod, tag, "port")
 	pgsql.Port = viper.GetString(port)
+	database := tools.ConfigEnvKey(prod, tag, "database")
+	pgsql.Database = viper.GetString(database)
 	user := tools.ConfigEnvKey(prod, tag, "user")
 	pgsql.User = viper.GetString(user)
 	pwd := tools.ConfigEnvKey(prod, tag, "pwd")
 	pgsql.Pwd = viper.GetString(pwd)
-	dbName := tools.ConfigEnvKey(prod, tag, "db_name")
-	pgsql.DBName = viper.GetString(dbName)
+	timeout := tools.ConfigEnvKey(prod, tag, "timeout")
+	pgsql.Timeout = viper.GetInt(timeout)
+	timeZone := tools.ConfigEnvKey(prod, tag, "timezone")
+	pgsql.TimeZone = viper.GetString(timeZone)
+	sslMode := tools.ConfigEnvKey(prod, tag, "sslmode")
+	pgsql.SSLMode = viper.GetString(sslMode)
 	return pgsql
 }
