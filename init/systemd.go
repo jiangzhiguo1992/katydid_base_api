@@ -7,7 +7,7 @@ import (
 
 func init() {
 	// configs
-	cloud, prod := tools.InitConfigStarts(configs.Files, configs.CloudKey, configs.ProdKey)
+	cloud, prod := tools.InitConfigStarts(configs.FilesGet(), configs.CloudKey, configs.ProdKey)
 	tools.InitConfigEnds(configs.FilesGetByCloud(cloud))
 
 	// logger

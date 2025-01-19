@@ -12,7 +12,10 @@ import (
 	"time"
 )
 
-const fileNameFormat = "06-01-02"
+const (
+	logDir         = "logs"
+	fileNameFormat = "06-01-02"
+)
 
 var (
 	logger *zap.Logger
@@ -36,11 +39,11 @@ func InitLogger(prod bool) {
 
 	if prod {
 		// writer
-		infoDir := path.Join("logs", "info")
-		warnDir := path.Join("logs", "warn")
-		errDir := path.Join("logs", "err")
-		pacDir := path.Join("logs", "pac")
-		fatDir := path.Join("logs", "fat")
+		infoDir := path.Join(logDir, "info")
+		warnDir := path.Join(logDir, "warn")
+		errDir := path.Join(logDir, "err")
+		pacDir := path.Join(logDir, "pac")
+		fatDir := path.Join(logDir, "fat")
 		if err := os.MkdirAll(infoDir, os.ModePerm); err != nil {
 			panic(errors.New(fmt.Sprintf("failed to create log_info_dir %s: %s", infoDir, err)))
 		}
