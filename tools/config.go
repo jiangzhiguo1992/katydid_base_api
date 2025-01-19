@@ -11,41 +11,50 @@ import (
 const (
 	configsDir = "./configs"
 
-	ModuleCloudKey = "module.cloud"
-	ModuleProdKey  = "module.prod"
-
 	InitKey   = "init"
 	CommonKey = "common"
 	LocalKey  = "local"
 	CloudKey  = "cloud"
 	SecretKey = "secret"
+
+	ModuleEnableKey = "module.enable"
+	ModuleCloudKey  = "module.cloud"
+	ModuleProdKey   = "module.prod"
 )
 
 func InitConfigs() (bool, bool) {
 	mapFiles := getConfigsFiles()
+	var settings map[string]any
 
 	for _, f := range mapFiles[InitKey] {
-		setUpConfig(false, f[0], f[1], f[2])
+		settings = setUpConfig(false, f[0], f[1], f[2])
 	}
-
-	for _, f := range mapFiles[CommonKey] {
-		setUpConfig(true, f[0], f[1], f[2])
-	}
-
 	cloud, prod := viper.GetBool(ModuleCloudKey), viper.GetBool(ModuleProdKey)
+	viper.Reset()
+
+	others := append(mapFiles[CommonKey], mapFiles[SecretKey]...)
 	if cloud {
-		for _, f := range mapFiles[CloudKey] {
-			setUpConfig(true, f[0], f[1], f[2])
-		}
+		others = append(others, mapFiles[CloudKey]...)
 	} else {
-		for _, f := range mapFiles[LocalKey] {
-			setUpConfig(true, f[0], f[1], f[2])
-		}
+		others = append(others, mapFiles[LocalKey]...)
 	}
 
-	for _, f := range mapFiles[SecretKey] {
+	for _, f := range others {
 		setUpConfig(true, f[0], f[1], f[2])
+		sets := viper.AllSettings()
+		for k, v := range sets {
+			settings[k] = v
+		}
+		viper.Reset()
 	}
+
+	for k, v := range settings {
+		viper.Set(k, v)
+	}
+	//viper.AutomaticEnv()
+
+	//tests := viper.AllSettings()
+	//fmt.Printf("------>%v\n", tests)
 
 	viper.WatchConfig()
 	viper.OnConfigChange(func(e fsnotify.Event) {
@@ -112,7 +121,7 @@ func splitFiles(files []string) [][3]string {
 	return params
 }
 
-func setUpConfig(merge bool, path, name, suffix string) {
+func setUpConfig(merge bool, path, name, suffix string) map[string]any {
 	fmt.Printf("加载配置, path:%s/%s.%s\n", path, name, suffix)
 	viper.AddConfigPath(path)
 	viper.SetConfigName(name)
@@ -126,6 +135,7 @@ func setUpConfig(merge bool, path, name, suffix string) {
 			log.Fatalf("read config failed: %v", err)
 		}
 	}
+	return viper.AllSettings()
 }
 
 func InitConfigsRemotes() {
