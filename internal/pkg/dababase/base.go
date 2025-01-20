@@ -3,9 +3,9 @@ package dababase
 type (
 	BaseModel struct {
 		Id       uint64 `json:"id"`
-		CreateAt int64  `json:"create_at" gorm:"autoCreateTime:milli"`
-		UpdateAt int64  `json:"update_at" gorm:"autoUpdateTime:milli"`
-		DeleteAt *int64
+		CreateAt int64  `json:"createAt" gorm:"autoCreateTime:milli"`
+		UpdateAt int64  `json:"updateAt" gorm:"autoUpdateTime:milli"`
+		DeleteAt *int64 // invisible
 	}
 )
 

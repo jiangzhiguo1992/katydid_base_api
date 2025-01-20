@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"katydid_base_api/internal/pkg/dababase"
+	"time"
+)
 
 // TODO:GG PGSQL <- Clients = 100 * Client
 // TODO:GG PGSQL <- Versions = Clients * Version
@@ -9,46 +12,37 @@ import "time"
 
 // Client 客户端
 type Client struct {
-	*Base
-	IP   int `json:"IP"`   // 系列 (eg:大富翁IP)
-	Part int `json:"part"` // 类型 (eg:单机版)
+	*dababase.BaseModel
+	IP   uint `json:"IP"`   // 系列 (eg:大富翁IP) TODO:GG idx_1
+	Part uint `json:"part"` // 类型 (eg:单机版) TODO:GG idx_1
 
-	Website    string `json:"website"`    // 官网
-	Company    string `json:"company"`    // 公司
-	Copyright  string `json:"copyright"`  // 版权
-	SupportUrl string `json:"supportUrl"` // 服务条款URL
-	PrivacyUrl string `json:"privacyUrl"` // 隐私政策URL
+	Enable    bool  `json:"enable"`    // 是否可用 (一般不用，下架之类的) TODO:GG idx_2, idx_3
+	OnlineAt  int64 `json:"onlineAt"`  // 上线时间 (时间没到时，只能停留在首页) TODO:GG idx_2
+	OfflineAt int64 `json:"offlineAt"` // 下线时间 (时间到后，强制下线+升级/等待/...) TODO:GG idx3
 
-	UserAccountMax int `json:"userAccountMax"` // 用户最多账户数 (身份证/护照/...)
-	UserTokenMax   int `json:"userTokenMax"`   // 用户最多令牌数 (同时登录最大数，防止工作室?)
-
-	OnlineAt  int64 `json:"onlineAt"`  // 上线时间 (时间没到时，只能停留在首页)
-	OfflineAt int64 `json:"offlineAt"` // 下线时间 (时间到后，强制升级/等待/etc)
-	Enable    bool  `json:"enable"`    // 是否可用 (一般不用，下架之类的，从conf读取)
+	Organization string `json:"organization"` // 组织 TODO:GG idx
 
 	Extra map[string]interface{} `json:"extra"` // 额外信息
 
-	Platforms   map[int]map[int]*ClientPlatform        `json:"platforms"`   // [area][platform]平台列表
-	LatestCodes map[int]map[int]map[int]*ClientVersion `json:"latestCodes"` // [area][platform][market]最新publish版本号
+	Platforms   map[int]map[int]*ClientPlatform        `json:"platforms" gorm:"-:all"`   // [area][platform]平台列表
+	LatestCodes map[int]map[int]map[int]*ClientVersion `json:"latestCodes" gorm:"-:all"` // [area][platform][market]最新publish版本号
 }
 
 func NewClient(
-	base *Base,
-	IP int, part int,
-	website string, company string, copyright string, supportUrl string, privacyUrl string,
-	userAccountMax int, userTokenMax int,
-	onlineAt int64, offlineAt int64, enable bool,
+	base *dababase.BaseModel,
+	IP uint, part uint,
+	enable bool, onlineAt int64, offlineAt int64,
+	organization string,
 	extra map[string]interface{},
 ) *Client {
 	return &Client{
-		Base: base,
-		IP:   IP, Part: part,
-		Website: website, Company: company, Copyright: copyright, SupportUrl: supportUrl, PrivacyUrl: privacyUrl,
-		UserAccountMax: userAccountMax, UserTokenMax: userTokenMax,
-		OnlineAt: onlineAt, OfflineAt: offlineAt, Enable: enable,
-		Extra:       extra,
-		Platforms:   map[int]map[int]*ClientPlatform{},
-		LatestCodes: map[int]map[int]map[int]*ClientVersion{},
+		BaseModel: base,
+		IP:        IP, Part: part,
+		Enable: enable, OnlineAt: onlineAt, OfflineAt: offlineAt,
+		Organization: organization,
+		Extra:        extra,
+		Platforms:    make(map[int]map[int]*ClientPlatform),
+		LatestCodes:  make(map[int]map[int]map[int]*ClientVersion),
 	}
 }
 
@@ -70,6 +64,142 @@ func (c *Client) IsComingOnline() bool {
 func (c *Client) IsComingOffline() bool {
 	currentTime := time.Now().Unix()
 	return c.OfflineAt > currentTime && (c.OnlineAt == -1 || c.OnlineAt < currentTime)
+}
+
+// SetWebsite 官网
+func (c *Client) SetWebsite(website *string) {
+	if (website != nil) && (len(*website) > 0) {
+		c.Extra["website"] = *website
+	} else {
+		delete(c.Extra, "website")
+	}
+}
+
+func (c *Client) GetWebsite() string {
+	if c.Extra == nil || c.Extra["website"] == nil {
+		return ""
+	}
+	return c.Extra["website"].(string)
+}
+
+// SetCopyrights 版权
+func (c *Client) SetCopyrights(copyrights *[]string) {
+	if (copyrights != nil) && (len(*copyrights) > 0) {
+		c.Extra["copyrights"] = *copyrights
+	} else {
+		delete(c.Extra, "copyrights")
+	}
+}
+
+func (c *Client) GetCopyrights() []string {
+	if c.Extra == nil || c.Extra["copyrights"] == nil {
+		return []string{}
+	}
+	return c.Extra["copyrights"].([]string)
+}
+
+// SetSupportUrl 服务条款URL
+func (c *Client) SetSupportUrl(supportUrl *string) {
+	if (supportUrl != nil) && (len(*supportUrl) > 0) {
+		c.Extra["supportUrl"] = *supportUrl
+	} else {
+		delete(c.Extra, "supportUrl")
+	}
+}
+
+func (c *Client) GetSupportUrl() string {
+	if c.Extra == nil || c.Extra["supportUrl"] == nil {
+		return ""
+	}
+	return c.Extra["supportUrl"].(string)
+}
+
+// SetPrivacyUrl 隐私政策URL
+func (c *Client) SetPrivacyUrl(privacyUrl *string) {
+	if (privacyUrl != nil) && (len(*privacyUrl) > 0) {
+		c.Extra["privacyUrl"] = *privacyUrl
+	} else {
+		delete(c.Extra, "privacyUrl")
+	}
+}
+
+func (c *Client) GetPrivacyUrl() string {
+	if c.Extra == nil || c.Extra["privacyUrl"] == nil {
+		return ""
+	}
+	return c.Extra["privacyUrl"].(string)
+}
+
+// SetBulletins 维护公告 (不同于version_log，不需要升级)
+func (c *Client) SetBulletins(bulletins *[]string) {
+	if (bulletins != nil) && (len(*bulletins) > 0) {
+		c.Extra["bulletins"] = *bulletins
+	} else {
+		delete(c.Extra, "bulletins")
+	}
+}
+
+func (c *Client) GetBulletins() []string {
+	if c.Extra == nil || c.Extra["bulletins"] == nil {
+		return []string{}
+	}
+	return c.Extra["bulletins"].([]string)
+}
+
+func (c *Client) GetBulletinLatest() string {
+	bulletins := c.GetBulletins()
+	if len(bulletins) <= 0 {
+		return ""
+	}
+	return bulletins[len(bulletins)-1]
+}
+
+// SetUserMaxAccount 用户最多账户数 (身份证/护照/...)
+func (c *Client) SetUserMaxAccount(userMaxAccount *int) {
+	if (userMaxAccount != nil) && (*userMaxAccount > 0) {
+		c.Extra["userMaxAccount"] = *userMaxAccount
+	} else {
+		delete(c.Extra, "userMaxAccount")
+	}
+}
+
+func (c *Client) GetUserMaxAccount() int {
+	if c.Extra == nil || c.Extra["userMaxAccount"] == nil {
+		return -1
+	}
+	return c.Extra["userMaxAccount"].(int)
+}
+
+func (c *Client) OverUserMaxAccount(count int) bool {
+	maxCount := c.GetUserMaxAccount()
+	if maxCount < 0 {
+		return false
+	}
+	return count > maxCount
+}
+
+// SetUserMaxToken 用户最多令牌数 (同时登录最大数，防止工作室?)
+func (c *Client) SetUserMaxToken(userMaxToken *int) {
+	if (userMaxToken != nil) && (*userMaxToken > 0) {
+		c.Extra["userMaxToken"] = *userMaxToken
+	} else {
+		delete(c.Extra, "userMaxToken")
+	}
+}
+
+func (c *Client) GetUserMaxToken() int {
+	if c.Extra == nil || c.Extra["userMaxToken"] == nil {
+		return -1
+	}
+	return c.Extra["userMaxToken"].(int)
+}
+
+func (c *Client) OverUserMaxToken(count int) bool {
+	maxCount := c.GetUserMaxToken()
+	if maxCount < 0 {
+		return false
+	}
+	return count > maxCount
 }
 
 func (c *Client) GetPlatform(area, platform int) *ClientPlatform {
