@@ -10,8 +10,8 @@ type MultiError struct {
 	Errors []*CodeError
 }
 
-func NewMultiError(errs ...*CodeError) *MultiError {
-	return &MultiError{Code: 0, Errors: errs}
+func NewMultiError(err error) *MultiError {
+	return &MultiError{Code: 0, Errors: []*CodeError{NewCodeError(err)}}
 }
 
 func (m *MultiError) WithCode(code int) *MultiError {
@@ -31,12 +31,13 @@ func (m *MultiError) Error() string {
 }
 
 // WrapError 包裹一个新的错误
-func (m *MultiError) WrapError(err error) {
-	m.WrapCodeError(NewCodeError(0, err))
+func (m *MultiError) WrapError(err error) *MultiError {
+	return m.WrapCodeError(NewCodeError(err))
 }
 
-func (m *MultiError) WrapCodeError(err *CodeError) {
+func (m *MultiError) WrapCodeError(err *CodeError) *MultiError {
 	m.Errors = append(m.Errors, err)
+	return m
 }
 
 // Unwrap 返回第一个错误
@@ -53,8 +54,13 @@ type CodeError struct {
 	Err  error
 }
 
-func NewCodeError(code int, err error) *CodeError {
-	return &CodeError{Err: err, Code: code}
+func NewCodeError(err error) *CodeError {
+	return &CodeError{Code: 0, Err: err}
+}
+
+func (c *CodeError) WithCode(code int) *CodeError {
+	c.Code = code
+	return c
 }
 
 func (c *CodeError) Error() string {

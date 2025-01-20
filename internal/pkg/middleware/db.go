@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"go.uber.org/zap"
 	"gorm.io/driver/postgres"
@@ -11,27 +12,29 @@ import (
 	"time"
 )
 
-func ConnPgSql(ctx context.Context) *gorm.DB {
-	config := configs.GetClient()
-	host := fmt.Sprintf("host=%s", config.PgSql.Host)
-	port := fmt.Sprintf("port=%s", config.PgSql.Port)
-	database := fmt.Sprintf("database=%s", config.PgSql.Database)
-	user := fmt.Sprintf("user=%s", config.PgSql.User)
+func ConnPgSql(ctx context.Context, config *configs.PgSqlConfig) *gorm.DB {
+	if config == nil {
+		tools.Panic("PgSql 配置为空", zap.Error(errors.New("PgSql 配置为空")))
+	}
+	host := fmt.Sprintf("host=%s", config.Host)
+	port := fmt.Sprintf("port=%s", config.Port)
+	database := fmt.Sprintf("database=%s", config.Database)
+	user := fmt.Sprintf("user=%s", config.User)
 	pwd := ""
-	if len(config.PgSql.Pwd) > 0 {
-		pwd = fmt.Sprintf("password=%s", config.PgSql.Pwd)
+	if len(config.Pwd) > 0 {
+		pwd = fmt.Sprintf("password=%s", config.Pwd)
 	}
 	timeOut := ""
-	if config.PgSql.Timeout > 0 {
-		timeOut = fmt.Sprintf("connect_timeout=%d", config.PgSql.Timeout)
+	if config.Timeout > 0 {
+		timeOut = fmt.Sprintf("connect_timeout=%d", config.Timeout)
 	}
 	sslMode := ""
-	if len(config.PgSql.SSLMode) > 0 {
-		sslMode = fmt.Sprintf("sslmode=%s", config.PgSql.SSLMode)
+	if len(config.SSLMode) > 0 {
+		sslMode = fmt.Sprintf("sslmode=%s", config.SSLMode)
 	}
 	timeZone := ""
-	if len(config.PgSql.TimeZone) > 0 {
-		timeZone = fmt.Sprintf("TimeZone=%s", config.PgSql.TimeZone)
+	if len(config.TimeZone) > 0 {
+		timeZone = fmt.Sprintf("TimeZone=%s", config.TimeZone)
 	}
 
 	dsn := fmt.Sprintf("%s %s %s %s %s %s %s %s", host, port, database, user, pwd, timeOut, sslMode, timeZone)
@@ -40,8 +43,8 @@ func ConnPgSql(ctx context.Context) *gorm.DB {
 	var db *gorm.DB
 	var err error
 
-	maxRetries := config.PgSql.MaxRetries
-	retryInterval := time.Duration(config.PgSql.RetryDelay) * time.Second
+	maxRetries := config.MaxRetries
+	retryInterval := time.Duration(config.RetryDelay) * time.Second
 
 	for i := 0; i < maxRetries; i++ {
 		db, err = gorm.Open(postgres.New(postgres.Config{
@@ -66,4 +69,22 @@ func ConnPgSql(ctx context.Context) *gorm.DB {
 
 	tools.Info("PgSql 连接成功", zap.String("dsn", dsn))
 	return db
+}
+
+func DisConnPgSql(db *gorm.DB) error {
+	if db == nil {
+		return errors.New("PgSql 断开连接失败，连接为空")
+	}
+	sqlDB, err := db.DB()
+	if err != nil {
+		tools.Error("PgSql 断开连接失败, 获取连接失败", zap.Error(err))
+		return tools.NewMultiError(err).WrapError(errors.New("PgSql 断开连接失败, 获取连接失败"))
+	}
+	err = sqlDB.Close()
+	if err != nil {
+		tools.Error("PgSql 断开连接失败, 关闭连接失败", zap.Error(err))
+		return tools.NewMultiError(err).WrapError(errors.New("PgSql 断开连接失败, 关闭连接失败"))
+	}
+	tools.Info("PgSql 断开连接成功")
+	return nil
 }
