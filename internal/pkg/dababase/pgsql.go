@@ -1,4 +1,4 @@
-package middleware
+package dababase
 
 import (
 	"context"
@@ -49,7 +49,10 @@ func ConnPgSql(ctx context.Context, config *configs.PgSqlConfig) *gorm.DB {
 	for i := 0; i < maxRetries; i++ {
 		db, err = gorm.Open(postgres.New(postgres.Config{
 			DSN: dsn, PreferSimpleProtocol: false, // enable implicit prepared statement usage
-		}), &gorm.Config{})
+			// TODO:GG 连接池(conf里读?)，看看gorm的文档
+		}), &gorm.Config{
+			// TODO:GG 配置 连接池，超时时间等，看看gorm的文档
+		})
 		if (db != nil) && (err == nil) {
 			break
 		}
