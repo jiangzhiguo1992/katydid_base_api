@@ -15,6 +15,7 @@ katydid_base_api 是一个基于 __golang__ 的 __api__ 项目，用于快速搭
 - 2.__gorm__ 用于操作数据库 (包括中间件 postgres、redis)
 - 3.__viper__ 用于读取配置文件和分布式配置中心
 - 4.__zap__ 用于日志记录 (内置fsnotify)
+- 5.__testify__ 用于单元测试
 
 ## 运行项目可执行如下操作
 

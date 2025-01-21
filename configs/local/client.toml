@@ -3,7 +3,7 @@
 [client.pgsql]
 host = "localhost"
 port = 5432
-database = "postgres"
+database = "katydid_base"
 user = "jiang"
 pwd = ""
 timeout = 10
