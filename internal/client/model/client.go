@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+// TODO:GG appKey 应该在网关/代理层? (不同平台不同密钥)
+
 // Client 客户端
 type Client struct {
 	*database.BaseModel
@@ -76,7 +78,7 @@ func (c *Client) SetWebsite(website *string) {
 }
 
 func (c *Client) GetWebsite() string {
-	if c.Extra == nil || c.Extra["website"] == nil {
+	if c.Extra["website"] == nil {
 		return ""
 	}
 	return c.Extra["website"].(string)
@@ -92,7 +94,7 @@ func (c *Client) SetCopyrights(copyrights *[]string) {
 }
 
 func (c *Client) GetCopyrights() []string {
-	if c.Extra == nil || c.Extra["copyrights"] == nil {
+	if c.Extra["copyrights"] == nil {
 		return []string{}
 	}
 	return c.Extra["copyrights"].([]string)
@@ -108,7 +110,7 @@ func (c *Client) SetSupportUrl(supportUrl *string) {
 }
 
 func (c *Client) GetSupportUrl() string {
-	if c.Extra == nil || c.Extra["supportUrl"] == nil {
+	if c.Extra["supportUrl"] == nil {
 		return ""
 	}
 	return c.Extra["supportUrl"].(string)
@@ -124,7 +126,7 @@ func (c *Client) SetPrivacyUrl(privacyUrl *string) {
 }
 
 func (c *Client) GetPrivacyUrl() string {
-	if c.Extra == nil || c.Extra["privacyUrl"] == nil {
+	if c.Extra["privacyUrl"] == nil {
 		return ""
 	}
 	return c.Extra["privacyUrl"].(string)
@@ -140,7 +142,7 @@ func (c *Client) SetBulletins(bulletins *[]string) {
 }
 
 func (c *Client) GetBulletins() []string {
-	if c.Extra == nil || c.Extra["bulletins"] == nil {
+	if c.Extra["bulletins"] == nil {
 		return []string{}
 	}
 	return c.Extra["bulletins"].([]string)
@@ -164,7 +166,7 @@ func (c *Client) SetUserMaxAccount(userMaxAccount *int) {
 }
 
 func (c *Client) GetUserMaxAccount() int {
-	if c.Extra == nil || c.Extra["userMaxAccount"] == nil {
+	if c.Extra["userMaxAccount"] == nil {
 		return -1
 	}
 	return c.Extra["userMaxAccount"].(int)
@@ -188,7 +190,7 @@ func (c *Client) SetUserMaxToken(userMaxToken *int) {
 }
 
 func (c *Client) GetUserMaxToken() int {
-	if c.Extra == nil || c.Extra["userMaxToken"] == nil {
+	if c.Extra["userMaxToken"] == nil {
 		return -1
 	}
 	return c.Extra["userMaxToken"].(int)
