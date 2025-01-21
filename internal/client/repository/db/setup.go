@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 	"katydid_base_api/configs"
 	_ "katydid_base_api/init"
-	"katydid_base_api/internal/pkg/dababase"
+	"katydid_base_api/internal/pkg/database"
 	"katydid_base_api/tools"
 	"sync"
 )
@@ -41,13 +41,13 @@ func DB() *gorm.DB {
 
 func RefreshDB(ctx context.Context) {
 	if conn != nil {
-		err := dababase.DisConnPgSql(conn)
+		err := database.DisConnPgSql(conn)
 		if err != nil {
 			tools.Panic("RefreshDB 断开连接 failed", zap.Error(err))
 		}
 	}
 	config := configs.GetClient()
-	conn = dababase.ConnPgSql(ctx, config.PgSql)
+	conn = database.ConnPgSql(ctx, config.PgSql)
 }
 
 func tableName(table string) string {

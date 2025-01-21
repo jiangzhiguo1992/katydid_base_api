@@ -1,4 +1,4 @@
-package dababase
+package database
 
 import (
 	"context"
