@@ -5,22 +5,17 @@ import (
 	"time"
 )
 
-// TODO:GG PGSQL <- Clients = 100 * Client
-// TODO:GG PGSQL <- Versions = Clients * Version
-// TODO:GG Mongo <- Stats = Versions * (24*365*10) * 4, 懒惰add没有就不add, 数据来源于应用商场?某些渠道没有数据,启动可以自己做？ (数据量过多可以合并旧数据，时->日->月->年)
-// TODO:GG Fetch <- Comments = 需要和Market同步，不存DB，api拉取
-
 // Client 客户端
 type Client struct {
 	*dababase.BaseModel
-	IP   uint `json:"IP"`   // 系列 (eg:大富翁IP) TODO:GG idx_1
-	Part uint `json:"part"` // 类型 (eg:单机版) TODO:GG idx_1
+	IP   uint `json:"IP"`   // 系列 (eg:大富翁IP)
+	Part uint `json:"part"` // 类型 (eg:单机版)
 
-	Enable    bool  `json:"enable"`    // 是否可用 (一般不用，下架之类的) TODO:GG idx_2, idx_3
-	OnlineAt  int64 `json:"onlineAt"`  // 上线时间 (时间没到时，只能停留在首页) TODO:GG idx_2
-	OfflineAt int64 `json:"offlineAt"` // 下线时间 (时间到后，强制下线+升级/等待/...) TODO:GG idx3
+	Enable    bool  `json:"enable"`    // 是否可用 (一般不用，下架之类的)
+	OnlineAt  int64 `json:"onlineAt"`  // 上线时间 (时间没到时，只能停留在首页)
+	OfflineAt int64 `json:"offlineAt"` // 下线时间 (时间到后，强制下线+升级/等待/...)
 
-	Organization string `json:"organization"` // 组织 TODO:GG idx
+	Organization string `json:"organization"` // 组织
 
 	Extra map[string]interface{} `json:"extra"` // 额外信息
 
@@ -31,36 +26,39 @@ type Client struct {
 func NewClient(
 	base *dababase.BaseModel,
 	IP uint, part uint,
-	enable bool, onlineAt int64, offlineAt int64,
+	enable bool,
 	organization string,
-	extra map[string]interface{},
 ) *Client {
 	return &Client{
 		BaseModel: base,
 		IP:        IP, Part: part,
-		Enable: enable, OnlineAt: onlineAt, OfflineAt: offlineAt,
+		Enable: enable, OnlineAt: -1, OfflineAt: -1,
 		Organization: organization,
-		Extra:        extra,
+		Extra:        map[string]interface{}{},
 		Platforms:    make(map[int]map[int]*ClientPlatform),
 		LatestCodes:  make(map[int]map[int]map[int]*ClientVersion),
 	}
 }
 
+// IsOnline 是否上线
 func (c *Client) IsOnline() bool {
 	currentTime := time.Now().Unix()
-	return c.OnlineAt <= currentTime && (c.OfflineAt == -1 || c.OfflineAt > currentTime)
+	return (c.OnlineAt > 0 && (c.OnlineAt <= currentTime)) && (c.OfflineAt == -1 || c.OfflineAt > currentTime)
 }
 
+// IsOffline 是否下线
 func (c *Client) IsOffline() bool {
 	currentTime := time.Now().Unix()
-	return c.OfflineAt <= currentTime && (c.OnlineAt == -1 || c.OnlineAt > currentTime)
+	return (c.OfflineAt > 0 && (c.OfflineAt <= currentTime)) && (c.OnlineAt == -1 || c.OnlineAt > currentTime)
 }
 
+// IsComingOnline 是否即将上线
 func (c *Client) IsComingOnline() bool {
 	currentTime := time.Now().Unix()
 	return c.OnlineAt > currentTime && (c.OfflineAt == -1 || c.OfflineAt < currentTime)
 }
 
+// IsComingOffline 是否即将下线
 func (c *Client) IsComingOffline() bool {
 	currentTime := time.Now().Unix()
 	return c.OfflineAt > currentTime && (c.OnlineAt == -1 || c.OnlineAt < currentTime)
