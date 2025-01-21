@@ -68,93 +68,93 @@ func (c *ClientPlatform) IsComingOffline() bool {
 	return c.OfflineAt > currentTime && (c.OnlineAt == -1 || c.OnlineAt < currentTime)
 }
 
-// SetMarkets 应用市场页面 (方便控制台跳转)
-func (c *ClientPlatform) SetMarkets(appMarkets *map[uint16]string) int {
+// SetMarketHomes 应用市场页面 (方便控制台跳转)
+func (c *ClientPlatform) SetMarketHomes(marketHomes *map[uint16]string) int {
 	var count int
-	if (appMarkets != nil) && (len(*appMarkets) > 0) {
-		for k := range *appMarkets {
-			ok := c.SetMarket(k, (*appMarkets)[k])
+	if (marketHomes != nil) && (len(*marketHomes) > 0) {
+		for k := range *marketHomes {
+			ok := c.SetMarketHome(k, (*marketHomes)[k])
 			if ok {
 				count++
 			}
 		}
 	} else {
-		delete(c.Extra, "appMarkets")
+		delete(c.Extra, "marketHomes")
 	}
 	return count
 }
 
-func (c *ClientPlatform) SetMarket(tp uint16, market string) bool {
+func (c *ClientPlatform) SetMarketHome(tp uint16, market string) bool {
 	if !isMarketTypeOk(c.Platform, tp) {
 		return false
 	} else if len(market) <= 0 {
-		if c.Extra["appMarkets"] != nil {
-			delete((c.Extra["appMarkets"]).(map[uint16]string), tp)
+		if c.Extra["marketHomes"] != nil {
+			delete((c.Extra["marketHomes"]).(map[uint16]string), tp)
 		}
 		return true
 	}
-	if c.Extra["appMarkets"] == nil {
-		c.Extra["appMarkets"] = map[uint16]string{}
+	if c.Extra["marketHomes"] == nil {
+		c.Extra["marketHomes"] = map[uint16]string{}
 	}
-	(c.Extra["appMarkets"]).(map[uint16]string)[tp] = market
+	(c.Extra["marketHomes"]).(map[uint16]string)[tp] = market
 	return true
 }
 
-func (c *ClientPlatform) GetMarkets() map[uint16]string {
-	if c.Extra["appMarkets"] == nil {
+func (c *ClientPlatform) GetMarketHomes() map[uint16]string {
+	if c.Extra["marketHomes"] == nil {
 		return map[uint16]string{}
 	}
-	return (c.Extra["appMarkets"]).(map[uint16]string)
+	return (c.Extra["marketHomes"]).(map[uint16]string)
 }
 
 func (c *ClientPlatform) GetMarket(tp uint16) string {
-	if v, ok := c.GetMarkets()[tp]; ok {
+	if v, ok := c.GetMarketHomes()[tp]; ok {
 		return v
 	}
 	return ""
 }
 
-// SetSocials 社交链接 (方便控制台跳转)
-func (c *ClientPlatform) SetSocials(socials *map[uint16]string) int {
+// SetSocialLinks 社交链接 (方便控制台跳转)
+func (c *ClientPlatform) SetSocialLinks(socialLinks *map[uint16]string) int {
 	var count int
-	if (socials != nil) && (len(*socials) > 0) {
-		for k := range *socials {
-			ok := c.SetSocial(k, (*socials)[k])
+	if (socialLinks != nil) && (len(*socialLinks) > 0) {
+		for k := range *socialLinks {
+			ok := c.SetSocialLink(k, (*socialLinks)[k])
 			if ok {
 				count++
 			}
 		}
 	} else {
-		delete(c.Extra, "socials")
+		delete(c.Extra, "socialLinks")
 	}
 	return count
 }
 
-func (c *ClientPlatform) SetSocial(tp uint16, social string) bool {
-	if !isSocialTypeOk(tp) {
+func (c *ClientPlatform) SetSocialLink(tp uint16, socialLink string) bool {
+	if !isSocialLinkTypeOk(tp) {
 		return false
-	} else if len(social) <= 0 {
-		if c.Extra["socials"] != nil {
-			delete((c.Extra["socials"]).(map[uint16]string), tp)
+	} else if len(socialLink) <= 0 {
+		if c.Extra["socialLinks"] != nil {
+			delete((c.Extra["socialLinks"]).(map[uint16]string), tp)
 		}
 		return true
 	}
-	if c.Extra["socials"] == nil {
-		c.Extra["socials"] = map[uint16]string{}
+	if c.Extra["socialLinks"] == nil {
+		c.Extra["socialLinks"] = map[uint16]string{}
 	}
-	(c.Extra["socials"]).(map[uint16]string)[tp] = social
+	(c.Extra["socialLinks"]).(map[uint16]string)[tp] = socialLink
 	return true
 }
 
-func (c *ClientPlatform) GetSocials() map[uint16]string {
-	if c.Extra["socials"] == nil {
+func (c *ClientPlatform) GetSocialLinks() map[uint16]string {
+	if c.Extra["socialLinks"] == nil {
 		return map[uint16]string{}
 	}
-	return (c.Extra["socials"]).(map[uint16]string)
+	return (c.Extra["socialLinks"]).(map[uint16]string)
 }
 
-func (c *ClientPlatform) GetSocial(tp uint16) string {
-	if v, ok := c.GetSocials()[tp]; ok {
+func (c *ClientPlatform) GetSocialLink(tp uint16) string {
+	if v, ok := c.GetSocialLinks()[tp]; ok {
 		return v
 	}
 	return ""
@@ -204,18 +204,18 @@ const (
 )
 
 const (
-	SocialTypeEmail     uint16 = 1
-	SocialTypePhone     uint16 = 2
-	SocialTypeQQ        uint16 = 3
-	SocialTypeWeChat    uint16 = 4
-	SocialTypeWeibo     uint16 = 5
-	SocialTypeFacebook  uint16 = 6
-	SocialTypeTwitter   uint16 = 7
-	SocialTypeTelegram  uint16 = 8
-	SocialTypeDiscord   uint16 = 9
-	SocialTypeInstagram uint16 = 10
-	SocialTypeYouTube   uint16 = 11
-	SocialTypeTikTok    uint16 = 12
+	SocialLinkTypeEmail     uint16 = 1
+	SocialLinkTypePhone     uint16 = 2
+	SocialLinkTypeQQ        uint16 = 3
+	SocialLinkTypeWeChat    uint16 = 4
+	SocialLinkTypeWeibo     uint16 = 5
+	SocialLinkTypeFacebook  uint16 = 6
+	SocialLinkTypeTwitter   uint16 = 7
+	SocialLinkTypeTelegram  uint16 = 8
+	SocialLinkTypeDiscord   uint16 = 9
+	SocialLinkTypeInstagram uint16 = 10
+	SocialLinkTypeYouTube   uint16 = 11
+	SocialLinkTypeTikTok    uint16 = 12
 )
 
 func isPlatformTypeOk(platformType uint16) bool {
@@ -245,20 +245,20 @@ func isAreaTypeOk(areaType uint16) bool {
 	return false
 }
 
-func isSocialTypeOk(socialType uint16) bool {
-	switch socialType {
-	case SocialTypeEmail,
-		SocialTypePhone,
-		SocialTypeQQ,
-		SocialTypeWeChat,
-		SocialTypeWeibo,
-		SocialTypeFacebook,
-		SocialTypeTwitter,
-		SocialTypeTelegram,
-		SocialTypeDiscord,
-		SocialTypeInstagram,
-		SocialTypeYouTube,
-		SocialTypeTikTok:
+func isSocialLinkTypeOk(socialLinkType uint16) bool {
+	switch socialLinkType {
+	case SocialLinkTypeEmail,
+		SocialLinkTypePhone,
+		SocialLinkTypeQQ,
+		SocialLinkTypeWeChat,
+		SocialLinkTypeWeibo,
+		SocialLinkTypeFacebook,
+		SocialLinkTypeTwitter,
+		SocialLinkTypeTelegram,
+		SocialLinkTypeDiscord,
+		SocialLinkTypeInstagram,
+		SocialLinkTypeYouTube,
+		SocialLinkTypeTikTok:
 		return true
 	}
 	return false
@@ -283,19 +283,19 @@ var areaInfos = map[uint16]string{
 	AreaTypeEurope:    "Europe",
 }
 
-var socialInfos = map[uint16]string{
-	SocialTypeEmail:     "Email",
-	SocialTypePhone:     "Phone",
-	SocialTypeQQ:        "QQ",
-	SocialTypeWeChat:    "WeChat",
-	SocialTypeWeibo:     "Weibo",
-	SocialTypeFacebook:  "Facebook",
-	SocialTypeTwitter:   "Twitter",
-	SocialTypeTelegram:  "Telegram",
-	SocialTypeDiscord:   "Discord",
-	SocialTypeInstagram: "Instagram",
-	SocialTypeYouTube:   "YouTube",
-	SocialTypeTikTok:    "TikTok",
+var socialLinkInfos = map[uint16]string{
+	SocialLinkTypeEmail:     "Email",
+	SocialLinkTypePhone:     "Phone",
+	SocialLinkTypeQQ:        "QQ",
+	SocialLinkTypeWeChat:    "WeChat",
+	SocialLinkTypeWeibo:     "Weibo",
+	SocialLinkTypeFacebook:  "Facebook",
+	SocialLinkTypeTwitter:   "Twitter",
+	SocialLinkTypeTelegram:  "Telegram",
+	SocialLinkTypeDiscord:   "Discord",
+	SocialLinkTypeInstagram: "Instagram",
+	SocialLinkTypeYouTube:   "YouTube",
+	SocialLinkTypeTikTok:    "TikTok",
 }
 
 func platformName(platformType uint16) string {
@@ -312,8 +312,8 @@ func areaName(areaType uint16) string {
 	return ""
 }
 
-func socialName(socialType uint16) string {
-	if v, ok := socialInfos[socialType]; ok {
+func socialLinkName(socialLinkType uint16) string {
+	if v, ok := socialLinkInfos[socialLinkType]; ok {
 		return v
 	}
 	return ""

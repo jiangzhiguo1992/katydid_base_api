@@ -5,8 +5,6 @@ import (
 	"time"
 )
 
-// TODO:GG appKey 应该在网关/代理层? (不同平台不同密钥)
-
 // Client 客户端
 type Client struct {
 	*database.BaseModel
