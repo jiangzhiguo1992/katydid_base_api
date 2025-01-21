@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm"
 	"katydid_base_api/configs"
 	"katydid_base_api/tools"
+	"strings"
 	"time"
 )
 
@@ -57,7 +58,8 @@ func ConnPgSql(ctx context.Context, config *configs.PgSqlConfig) *gorm.DB {
 			break
 		}
 
-		tools.Warn("PgSql 连接失败，重试中...", zap.Int("times", i), zap.String("dsn", dsn), zap.Error(err))
+		log := strings.Replace(dsn, pwd, "", 1)
+		tools.Warn("PgSql 连接失败，重试中...", zap.Int("times", i), zap.String("dsn", log), zap.Error(err))
 		//time.Sleep(retryInterval)
 		select {
 		case <-time.After(retryInterval):
@@ -67,10 +69,12 @@ func ConnPgSql(ctx context.Context, config *configs.PgSqlConfig) *gorm.DB {
 	}
 
 	if err != nil {
-		tools.Panic("PgSql 连接失败", zap.String("dsn", dsn), zap.Error(err))
+		log := strings.Replace(dsn, pwd, "", 1)
+		tools.Panic("PgSql 连接失败", zap.String("dsn", log), zap.Error(err))
 	}
 
-	tools.Info("PgSql 连接成功", zap.String("dsn", dsn))
+	log := strings.Replace(dsn, pwd, "", 1)
+	tools.Info("PgSql 连接成功", zap.String("dsn", log))
 	return db
 }
 
