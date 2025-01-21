@@ -17,20 +17,19 @@ type Client struct {
 
 	Organization string `json:"organization"` // 组织
 
-	Extra map[string]interface{} `json:"extra"` // 额外信息
+	Extra map[string]interface{} `json:"extra" gorm:"serializer:json"` // 额外信息
 
 	Platforms   map[int]map[int]*ClientPlatform        `json:"platforms" gorm:"-:all"`   // [area][platform]平台列表
 	LatestCodes map[int]map[int]map[int]*ClientVersion `json:"latestCodes" gorm:"-:all"` // [area][platform][market]最新publish版本号
 }
 
-func NewClient(
-	base *dababase.BaseModel,
+func NewClientDefault(
 	IP uint, part uint,
 	enable bool,
 	organization string,
 ) *Client {
 	return &Client{
-		BaseModel: base,
+		BaseModel: dababase.NewBaseModelEmpty(),
 		IP:        IP, Part: part,
 		Enable: enable, OnlineAt: -1, OfflineAt: -1,
 		Organization: organization,
