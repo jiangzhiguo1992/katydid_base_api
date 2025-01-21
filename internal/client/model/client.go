@@ -1,26 +1,26 @@
 package model
 
 import (
-	"katydid_base_api/internal/pkg/dababase"
+	"katydid_base_api/internal/pkg/database"
 	"time"
 )
 
 // Client 客户端
 type Client struct {
-	*dababase.BaseModel
+	*database.BaseModel
 	IP   uint `json:"IP"`   // 系列 (eg:大富翁IP)
 	Part uint `json:"part"` // 类型 (eg:单机版)
 
-	Enable    bool  `json:"enable"`    // 是否可用 (一般不用，下架之类的)
-	OnlineAt  int64 `json:"onlineAt"`  // 上线时间 (时间没到时，只能停留在首页)
+	Enable    bool  `json:"enable"`    // 是否可用 (一般不用，下架之类的，没有reason)
+	OnlineAt  int64 `json:"onlineAt"`  // 上线时间 (时间没到时，只能停留在首页，提示bulletins)
 	OfflineAt int64 `json:"offlineAt"` // 下线时间 (时间到后，强制下线+升级/等待/...)
 
 	Organization string `json:"organization"` // 组织
 
 	Extra map[string]interface{} `json:"extra" gorm:"serializer:json"` // 额外信息
 
-	Platforms   map[int]map[int]*ClientPlatform        `json:"platforms" gorm:"-:all"`   // [area][platform]平台列表
-	LatestCodes map[int]map[int]map[int]*ClientVersion `json:"latestCodes" gorm:"-:all"` // [area][platform][market]最新publish版本号
+	Platforms   map[uint16]map[uint16]*ClientPlatform           `json:"platforms" gorm:"-:all"`   // [platform][area]平台列表
+	LatestCodes map[uint16]map[uint16]map[uint16]*ClientVersion `json:"latestCodes" gorm:"-:all"` // [platform][area][market]最新publish版本号
 }
 
 func NewClientDefault(
@@ -28,14 +28,17 @@ func NewClientDefault(
 	enable bool,
 	organization string,
 ) *Client {
+	if len(organization) <= 0 {
+		return nil
+	}
 	return &Client{
-		BaseModel: dababase.NewBaseModelEmpty(),
+		BaseModel: database.NewBaseModelEmpty(),
 		IP:        IP, Part: part,
 		Enable: enable, OnlineAt: -1, OfflineAt: -1,
 		Organization: organization,
 		Extra:        map[string]interface{}{},
-		Platforms:    make(map[int]map[int]*ClientPlatform),
-		LatestCodes:  make(map[int]map[int]map[int]*ClientVersion),
+		Platforms:    make(map[uint16]map[uint16]*ClientPlatform),
+		LatestCodes:  make(map[uint16]map[uint16]map[uint16]*ClientVersion),
 	}
 }
 
@@ -199,19 +202,19 @@ func (c *Client) OverUserMaxToken(count int) bool {
 	return count > maxCount
 }
 
-func (c *Client) GetPlatform(area, platform int) *ClientPlatform {
-	if _, ok := c.Platforms[area]; !ok {
+func (c *Client) GetPlatform(platform, area uint16) *ClientPlatform {
+	if _, ok := c.Platforms[platform]; !ok {
 		return nil
 	}
-	return c.Platforms[area][platform]
+	return c.Platforms[platform][area]
 }
 
-func (c *Client) GetLatestCode(area, platform, market int) *ClientVersion {
-	if _, ok := c.LatestCodes[area]; !ok {
+func (c *Client) GetLatestCode(platform, area, market uint16) *ClientVersion {
+	if _, ok := c.LatestCodes[platform]; !ok {
 		return nil
 	}
-	if _, ok := c.LatestCodes[area][platform]; !ok {
+	if _, ok := c.LatestCodes[platform][area]; !ok {
 		return nil
 	}
-	return c.LatestCodes[area][platform][market]
+	return c.LatestCodes[platform][area][market]
 }
