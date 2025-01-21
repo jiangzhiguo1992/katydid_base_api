@@ -2,6 +2,7 @@ package utils
 
 import (
 	"errors"
+	"go.uber.org/zap"
 	"katydid_base_api/tools"
 	"strings"
 )
@@ -34,15 +35,20 @@ func MatchErrorCode(code int) *tools.CodeError {
 			Err:  errors.New(message),
 		}
 	}
+	tools.Warn("MatchErrorCode 没有匹配的错误Code:", zap.Int("code", code))
 	return nil
 }
 
 func MatchCodeError(err error) *tools.CodeError {
+	if err == nil {
+		return nil
+	}
 	for msg, code := range errorCodes {
 		if strings.Contains(err.Error(), msg) {
 			if errorCode := MatchErrorCode(code); errorCode != nil {
 				return errorCode
 			}
+			tools.Warn("MatchCodeError 没有匹配的错误Msg:", zap.Error(err))
 			return &tools.CodeError{
 				Code: code,
 				Err:  err,

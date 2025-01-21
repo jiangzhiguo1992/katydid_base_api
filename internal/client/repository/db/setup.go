@@ -9,20 +9,29 @@ import (
 	_ "katydid_base_api/init"
 	"katydid_base_api/internal/pkg/dababase"
 	"katydid_base_api/tools"
+	"sync"
 )
 
 const (
 	scheme = "clients"
 
-	tClient = "client"
+	tClient         = "client"
+	tClientPlatform = "client_platform"
+	tClientVersion  = "client_version"
 )
 
 var (
-	conn *gorm.DB
+	lock sync.Mutex
 	ctx  = context.Background()
+	conn *gorm.DB
 )
 
 func DB() *gorm.DB {
+	if conn != nil {
+		return conn
+	}
+	lock.Lock()
+	defer lock.Unlock()
 	if conn != nil {
 		return conn
 	}

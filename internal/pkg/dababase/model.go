@@ -12,3 +12,7 @@ type (
 func NewBaseModel(id uint64, createAt int64, updateAt int64) *BaseModel {
 	return &BaseModel{Id: id, CreateAt: createAt, UpdateAt: updateAt, DeleteAt: nil}
 }
+
+func NewBaseModelEmpty() *BaseModel {
+	return &BaseModel{}
+}
