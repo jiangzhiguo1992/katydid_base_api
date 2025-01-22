@@ -2,6 +2,8 @@ package model
 
 import (
 	"katydid_base_api/internal/pkg/database"
+	"katydid_base_api/internal/pkg/utils"
+	"katydid_base_api/tools"
 	"time"
 )
 
@@ -29,10 +31,7 @@ func NewClientDefault(
 	enable bool,
 	IPName string, organization string,
 ) *Client {
-	if len(organization) <= 0 {
-		return nil
-	}
-	return &Client{
+	client := &Client{
 		BaseModel: database.NewBaseModelEmpty(),
 		IP:        IP, Part: part,
 		Enable: enable, OnlineAt: -1, OfflineAt: -1,
@@ -41,6 +40,77 @@ func NewClientDefault(
 		Platforms:   make(map[uint16]map[uint16]*ClientPlatform),
 		LatestCodes: make(map[uint16]map[uint16]map[uint16]*ClientVersion),
 	}
+	client.FieldsCheck = client.CheckFields
+	return client
+}
+
+const (
+	CheckClientIPNameLen       = 100
+	CheckClientOrganizationLen = 100
+	CheckClientWebsiteLen      = 10
+	CheckClientCopyrightsNum   = 500
+	CheckClientCopyrightLen    = 500
+	CheckClientSupportUrlLen   = 500
+	CheckClientPrivacyUrlLen   = 500
+	CheckClientBulletinsNum    = 500
+	CheckClientBulletinLen     = 10000
+)
+
+func (c *Client) CheckFields() []*tools.CodeError {
+	var errors []*tools.CodeError
+	if len(c.IPName) <= 0 {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("IPName"))
+	} else if len(c.IPName) > CheckClientIPNameLen {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("IPName"))
+	}
+	if len(c.Organization) <= 0 {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("Organization"))
+	} else if len(c.Organization) > CheckClientOrganizationLen {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("Organization"))
+	}
+	//if len(c.Extra) > CheckClientExtraNum {
+	//	errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("Extra"))
+	//}
+	for k, v := range c.Extra {
+		switch k {
+		case "website":
+			if len(v.(string)) > CheckClientWebsiteLen {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("website "))
+			}
+		case "copyrights":
+			if len(v.([]string)) > CheckClientCopyrightsNum {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("copyrights "))
+			}
+			for _, copyright := range v.([]string) {
+				if len(copyright) > CheckClientCopyrightLen {
+					errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("copyright "))
+				}
+			}
+		case "supportUrl":
+			if len(v.(string)) > CheckClientSupportUrlLen {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("supportUrl "))
+			}
+		case "privacyUrl":
+			if len(v.(string)) > CheckClientPrivacyUrlLen {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("privacyUrl "))
+			}
+		case "bulletins":
+			if len(v.([]string)) > CheckClientBulletinsNum {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("bulletins "))
+			}
+			for _, bulletin := range v.([]string) {
+				if len(bulletin) > CheckClientBulletinLen {
+					errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("bulletin "))
+				}
+			}
+		case "userMaxAccount":
+		case "userMaxToken":
+			continue
+		default:
+			errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldUnDef).WithPrefix(k+" "))
+		}
+	}
+	return errors
 }
 
 // IsOnline 是否上线

@@ -50,12 +50,14 @@ func (m *MultiCodeError) Unwrap() error {
 
 // CodeError 是一个可以包裹错误码的结构体
 type CodeError struct {
-	Code int
-	Err  error
+	Code   int
+	Err    error
+	Prefix string
+	Suffix string
 }
 
 func NewCodeError(err error) *CodeError {
-	return &CodeError{Code: 0, Err: err}
+	return &CodeError{Code: 0, Err: err, Prefix: "", Suffix: ""}
 }
 
 func (c *CodeError) WithCode(code int) *CodeError {
@@ -63,6 +65,16 @@ func (c *CodeError) WithCode(code int) *CodeError {
 	return c
 }
 
+func (c *CodeError) WithPrefix(prefix string) *CodeError {
+	c.Prefix = prefix
+	return c
+}
+
+func (c *CodeError) WithSuffix(suffix string) *CodeError {
+	c.Suffix = suffix
+	return c
+}
+
 func (c *CodeError) Error() string {
-	return c.Err.Error()
+	return fmt.Sprintf("%s%s%s", c.Prefix, c.Err.Error(), c.Suffix)
 }
