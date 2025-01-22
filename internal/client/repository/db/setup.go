@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 	"katydid_base_api/configs"
 	_ "katydid_base_api/init"
-	"katydid_base_api/internal/pkg/database"
+	"katydid_base_api/internal/pkg/db"
 	"katydid_base_api/tools"
 	"sync"
 )
@@ -42,13 +42,13 @@ func DB() *gorm.DB {
 // RefreshDB TODO:GG 什么时候调用，怎么保持断了重连?
 func RefreshDB(ctx context.Context) {
 	if conn != nil {
-		err := database.DisConnPgSql(conn)
+		err := db.DisConnPgSql(conn)
 		if err != nil {
 			tools.Panic("RefreshDB 断开连接 failed", zap.Error(err))
 		}
 	}
 	config := configs.GetClient()
-	conn = database.ConnPgSql(ctx, config.PgSql)
+	conn = db.ConnPgSql(ctx, config.PgSql)
 }
 
 func pgsqlTableName(table string) string {
