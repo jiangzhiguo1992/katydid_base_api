@@ -8,34 +8,36 @@ import (
 )
 
 const (
-	ErrorCodeDBInsNil     = 1002
-	ErrorCodeDBSelNil     = 1003
-	ErrorCodeDBUpdNil     = 1004
-	ErrorCodeDBDelNil     = 1005
-	ErrorCodeDBFieldNil   = 1006
-	ErrorCodeDBFieldLarge = 1007 // 长
-	ErrorCodeDBFieldShort = 1008 // 短
-	ErrorCodeDBFieldMax   = 1009 // 数量大
-	ErrorCodeDBFieldMin   = 1010 // 数量小
-	ErrorCodeDBFieldRange = 1011
-	ErrorCodeDBFieldUnDef = 1012
-	ErrorCodeDBDupPk      = 1001
+	ErrorCodeDBInsNil      = 1002
+	ErrorCodeDBSelNil      = 1003
+	ErrorCodeDBUpdNil      = 1004
+	ErrorCodeDBDelNil      = 1005
+	ErrorCodeDBFieldNil    = 1006
+	ErrorCodeDBFieldLarge  = 1007 // 长
+	ErrorCodeDBFieldShort  = 1008 // 短
+	ErrorCodeDBFieldMax    = 1009 // 数量大
+	ErrorCodeDBFieldMin    = 1010 // 数量小
+	ErrorCodeDBFieldRange  = 1011
+	ErrorCodeDBFieldUnDef  = 1012
+	ErrorCodeDBDupPk       = 1001
+	ErrorCodeDBQueryParams = 1013
 )
 
 // TODO:GG 国际化
 var errorMessages = map[int]string{
-	ErrorCodeDBInsNil:     "插入对象为空",
-	ErrorCodeDBSelNil:     "查询对象为空",
-	ErrorCodeDBUpdNil:     "更新对象为空",
-	ErrorCodeDBDelNil:     "删除对象为空",
-	ErrorCodeDBFieldNil:   "数据库字段为空",
-	ErrorCodeDBFieldLarge: "数据库字段过长",
-	ErrorCodeDBFieldShort: "数据库字段过短",
-	ErrorCodeDBFieldMax:   "数据库字段数量过多",
-	ErrorCodeDBFieldMin:   "数据库字段数量过少",
-	ErrorCodeDBFieldRange: "数据库字段范围错误",
-	ErrorCodeDBFieldUnDef: "数据库字段未定义",
-	ErrorCodeDBDupPk:      "数据库唯一约束冲突",
+	ErrorCodeDBInsNil:      "插入对象为空",
+	ErrorCodeDBSelNil:      "查询对象为空",
+	ErrorCodeDBUpdNil:      "更新对象为空",
+	ErrorCodeDBDelNil:      "删除对象为空",
+	ErrorCodeDBFieldNil:    "数据库字段为空",
+	ErrorCodeDBFieldLarge:  "数据库字段过长",
+	ErrorCodeDBFieldShort:  "数据库字段过短",
+	ErrorCodeDBFieldMax:    "数据库字段数量过多",
+	ErrorCodeDBFieldMin:    "数据库字段数量过少",
+	ErrorCodeDBFieldRange:  "数据库字段范围错误",
+	ErrorCodeDBFieldUnDef:  "数据库字段未定义",
+	ErrorCodeDBDupPk:       "数据库唯一约束冲突",
+	ErrorCodeDBQueryParams: "数据库查询参数错误",
 }
 
 var errorCodes = map[string]int{

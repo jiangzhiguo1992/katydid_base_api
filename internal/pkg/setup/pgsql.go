@@ -1,11 +1,10 @@
-package init
+package setup
 
 import (
 	"context"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	"katydid_base_api/configs"
-	_ "katydid_base_api/init"
 	"katydid_base_api/internal/pkg/middleware"
 	"katydid_base_api/tools"
 	"sync"

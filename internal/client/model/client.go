@@ -252,11 +252,11 @@ func (c *Client) CheckFields() []*tools.CodeError {
 		switch k {
 		case "website":
 			if len(v.(string)) > checkClientWebsiteLen {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("website "))
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("website"))
 			}
 		case "copyrights":
 			if len(v.([]string)) > checkClientCopyrightsNum {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("copyrights "))
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("copyrights"))
 			}
 			for kk, vv := range v.([]string) {
 				if len(vv) > checkClientCopyrightLen {
@@ -265,15 +265,15 @@ func (c *Client) CheckFields() []*tools.CodeError {
 			}
 		case "supportUrl":
 			if len(v.(string)) > checkClientSupportUrlLen {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("supportUrl "))
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("supportUrl"))
 			}
 		case "privacyUrl":
 			if len(v.(string)) > checkClientPrivacyUrlLen {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("privacyUrl "))
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("privacyUrl"))
 			}
 		case "bulletins":
 			if len(v.([]string)) > checkClientBulletinsNum {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("bulletins "))
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("bulletins"))
 			}
 			for kk, vv := range v.([]string) {
 				if len(vv) > checkClientBulletinLen {
@@ -284,7 +284,7 @@ func (c *Client) CheckFields() []*tools.CodeError {
 		case "userMaxToken":
 			continue
 		default:
-			errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldUnDef).WithPrefix(k+" "))
+			errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldUnDef).WithPrefix(k))
 		}
 	}
 	return errors

@@ -197,39 +197,39 @@ const (
 func (c *ClientVersion) CheckFields() []*tools.CodeError {
 	var errors []*tools.CodeError
 	if !isMarketTypeOk(c.Market) {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldRange).WithPrefix("Market "))
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldRange).WithPrefix("Market"))
 	}
 	if len(c.Url) <= 0 {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("Url "))
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("Url"))
 	} else if len(c.Url) > checkClientVersionUrlLen {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("Url "))
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("Url"))
 	}
 	if len(c.AppKey) <= 0 {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("AppKey "))
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("AppKey"))
 	} else if len(c.AppKey) > checkClientVersionAppKeyLen {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("AppKey "))
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("AppKey"))
 	}
 	for k, v := range c.Extra {
 		switch k {
 		case "name":
 			if len(v.(string)) > checkClientVersionNameLen {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("name "))
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("name"))
 			}
 		case "iconUrl":
 			if len(v.(string)) > checkClientVersionIconUrlLen {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("iconUrl "))
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("iconUrl"))
 			}
 		case "compact":
 			if len(v.(string)) > checkClientVersionCompactLen {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("compact "))
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("compact"))
 			}
 		case "log":
 			if len(v.(string)) > checkClientVersionLogLen {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("log "))
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("log"))
 			}
 		case "imgUrls":
 			if len(v.([]string)) > checkClientVersionImgUrlsNum {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("imgUrls "))
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("imgUrls"))
 			}
 			for kk, vv := range v.([]string) {
 				if len(vv) > checkClientVersionImgUrlLen {
@@ -238,7 +238,7 @@ func (c *ClientVersion) CheckFields() []*tools.CodeError {
 			}
 		case "videoUrls":
 			if len(v.([]string)) > checkClientVersionVideoUrlsNum {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("videoUrls "))
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("videoUrls"))
 			}
 			for kk, vv := range v.([]string) {
 				if len(vv) > checkClientVersionVideoUrlLen {
@@ -247,10 +247,10 @@ func (c *ClientVersion) CheckFields() []*tools.CodeError {
 			}
 		case "iosId":
 			if len(v.(string)) > checkClientVersionIosIdLen {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("iosId "))
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("iosId"))
 			}
 		default:
-			errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldUnDef).WithPrefix(k+" "))
+			errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldUnDef).WithPrefix(k))
 		}
 	}
 	return errors

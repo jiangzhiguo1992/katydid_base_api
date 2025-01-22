@@ -196,26 +196,26 @@ const (
 func (c *ClientPlatform) CheckFields() []*tools.CodeError {
 	var errors []*tools.CodeError
 	if !isPlatformTypeOk(c.Platform) {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldRange).WithPrefix("Platform "))
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldRange).WithPrefix("Platform"))
 	}
 	if !isAreaTypeOk(c.Area) {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldRange).WithPrefix("Area "))
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldRange).WithPrefix("Area"))
 	}
 	if len(c.AppId) <= 0 {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("AppId "))
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("AppId"))
 	} else if len(c.AppId) > checkClientPlatformAppIdLen {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("AppId "))
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("AppId"))
 	}
 	if len(c.AppName) <= 0 {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("AppName "))
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("AppName"))
 	} else if len(c.AppName) > checkClientPlatformAppNameLen {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("AppName "))
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("AppName"))
 	}
 	for k, v := range c.Extra {
 		switch k {
 		case "socialLinks":
 			if len(v.(map[uint16]string)) > checkClientPlatformSocialLinksNum {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("socialLinks "))
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("socialLinks"))
 			}
 			for kk, vv := range v.(map[uint16]string) {
 				if len(vv) > checkClientPlatformSocialLinkLen {
@@ -224,7 +224,7 @@ func (c *ClientPlatform) CheckFields() []*tools.CodeError {
 			}
 		case "marketHomes":
 			if len(v.(map[uint]string)) > checkClientPlatformMarketHomesNum {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("marketHomes "))
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("marketHomes"))
 			}
 			for kk, vv := range v.(map[uint]string) {
 				if len(vv) > checkClientPlatformMarketHomeLen {
@@ -233,10 +233,10 @@ func (c *ClientPlatform) CheckFields() []*tools.CodeError {
 			}
 		case "iosId":
 			if len(v.(string)) > checkClientPlatformIosIdLen {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("iosId "))
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("iosId"))
 			}
 		default:
-			errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldUnDef).WithPrefix(k+" "))
+			errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldUnDef).WithPrefix(k))
 		}
 	}
 	return errors

@@ -76,5 +76,13 @@ func (c *CodeError) WithSuffix(suffix string) *CodeError {
 }
 
 func (c *CodeError) Error() string {
-	return fmt.Sprintf("%s%s%s", c.Prefix, c.Err.Error(), c.Suffix)
+	prefix := ""
+	if len(c.Prefix) > 0 {
+		prefix = fmt.Sprintf("%s_: ", c.Prefix)
+	}
+	suffix := ""
+	if len(c.Suffix) > 0 {
+		suffix = fmt.Sprintf(" :_%s", c.Suffix)
+	}
+	return fmt.Sprintf("%s%s%s", prefix, c.Err.Error(), suffix)
 }
