@@ -1,43 +1,46 @@
 package tools
 
 import (
+	"errors"
 	"fmt"
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 	"log"
+	"os"
+	"path"
 	"path/filepath"
 )
 
 const (
-	configsDir = "./configs"
+	configsDir = "./configs" // 目录
 
-	InitKey   = "init"
-	CommonKey = "common"
-	LocalKey  = "local"
-	CloudKey  = "cloud"
-	SecretKey = "secret"
+	keyInit   = "init"   // 初始化配置 (最先加载的)
+	keyCommon = "common" // 公共配置 (始终加载，不被ignore)
+	keyLocal  = "local"  // 本地配置 (本地加载，不被ignore)
+	keyCloud  = "cloud"  // 云端配置 (云端加载，被ignore)
+	keySecret = "secret" // 秘密配置 (始终加载，被ignore)
 
-	ModuleEnableKey = "module.enable"
-	ModuleCloudKey  = "module.cloud"
-	ModuleProdKey   = "module.prod"
+	AppEnableKey = "app.enable" // 按照规则写
+	AppCloudKey  = "app.cloud"  // 按照规则写
+	AppProdKey   = "app.prod"   // 按照规则写
 )
 
 // InitConfigs 初始化配置
-func InitConfigs() (bool, bool) {
+func InitConfigs() (bool, bool, bool) {
 	mapFiles := getConfigsFiles()
 	var settings map[string]any
 
-	for _, f := range mapFiles[InitKey] {
+	for _, f := range mapFiles[keyInit] {
 		settings = setUpConfig(false, f[0], f[1], f[2])
 	}
-	cloud, prod := viper.GetBool(ModuleCloudKey), viper.GetBool(ModuleProdKey)
+	enable, cloud, prod := viper.GetBool(AppEnableKey), viper.GetBool(AppCloudKey), viper.GetBool(AppProdKey)
 	viper.Reset()
 
-	others := append(mapFiles[CommonKey], mapFiles[SecretKey]...)
+	others := append(mapFiles[keyCommon], mapFiles[keySecret]...)
 	if cloud {
-		others = append(others, mapFiles[CloudKey]...)
+		others = append(others, mapFiles[keyCloud]...)
 	} else {
-		others = append(others, mapFiles[LocalKey]...)
+		others = append(others, mapFiles[keyLocal]...)
 	}
 
 	for _, f := range others {
@@ -62,52 +65,66 @@ func InitConfigs() (bool, bool) {
 		// TODO:GG 配置会被更新，这里要做一些相关的re_init操作
 		fmt.Printf("config file changed name:%s\n", e.Name)
 	})
-	return cloud, prod
+	return enable, cloud, prod
 }
 
 // getConfigsFiles 获取配置文件
 func getConfigsFiles() map[string][][3]string {
+	// creates
+	dirs := []string{
+		path.Join(configsDir, keyInit),
+		path.Join(configsDir, keyCommon),
+		path.Join(configsDir, keyLocal),
+		path.Join(configsDir, keyCloud),
+		path.Join(configsDir, keySecret),
+	}
+	for _, v := range dirs {
+		if err := os.MkdirAll(v, os.ModePerm); err != nil {
+			panic(errors.New(fmt.Sprintf("failed to create configs_dir %s: %s", v, err)))
+		}
+	}
+
 	// init
-	initFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.toml", configsDir, InitKey))
+	initFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.toml", configsDir, keyInit))
 	if err != nil {
 		panic(err)
 	}
 	initParams := splitFiles(initFiles)
 
 	// common
-	commonFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.toml", configsDir, CommonKey))
+	commonFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.toml", configsDir, keyCommon))
 	if err != nil {
 		panic(err)
 	}
 	commonParams := splitFiles(commonFiles)
 
 	// local
-	localFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.toml", configsDir, LocalKey))
+	localFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.toml", configsDir, keyLocal))
 	if err != nil {
 		panic(err)
 	}
 	localParams := splitFiles(localFiles)
 
 	// cloud (ignore)
-	cloudFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.toml", configsDir, CloudKey))
+	cloudFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.toml", configsDir, keyCloud))
 	if err != nil {
 		panic(err)
 	}
 	cloudParams := splitFiles(cloudFiles)
 
 	// secret (ignore)
-	secretFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.toml", configsDir, SecretKey))
+	secretFiles, err := filepath.Glob(fmt.Sprintf("%s/%s/*.toml", configsDir, keySecret))
 	if err != nil {
 		panic(err)
 	}
 	secretParams := splitFiles(secretFiles)
 
 	return map[string][][3]string{
-		InitKey:   initParams,
-		CommonKey: commonParams,
-		LocalKey:  localParams,
-		CloudKey:  cloudParams,
-		SecretKey: secretParams,
+		keyInit:   initParams,
+		keyCommon: commonParams,
+		keyLocal:  localParams,
+		keyCloud:  cloudParams,
+		keySecret: secretParams,
 	}
 }
 
