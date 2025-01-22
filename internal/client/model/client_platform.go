@@ -32,11 +32,6 @@ func NewClientPlatformDefault(
 	enable bool,
 	appId string, appName string,
 ) *ClientPlatform {
-	if !isPlatformTypeOk(platform) || !isAreaTypeOk(area) {
-		return nil
-	} else if (len(appId) <= 0) || (len(appName) <= 0) {
-		return nil
-	}
 	return &ClientPlatform{
 		BaseModel: database.NewBaseModelEmpty(),
 		Cid:       Cid, Platform: platform, Area: area,
@@ -45,72 +40,6 @@ func NewClientPlatformDefault(
 		Extra:         map[string]interface{}{},
 		LatestVersion: make(map[uint16]*ClientVersion),
 	}
-}
-
-const (
-	checkClientPlatformAppId   = 100
-	checkClientPlatformAppName = 100
-
-	checkClientPlatformSocialLinksNum = 100
-	checkClientPlatformSocialLinkLen  = 500
-	checkClientPlatformMarketHomesNum = 100
-	checkClientPlatformMarketHomeLen  = 500
-	checkClientPlatformIosIdLen       = 50
-)
-
-// CheckFields 检查字段
-func (c *ClientPlatform) CheckFields() []*tools.CodeError {
-	var errors []*tools.CodeError
-	if len(c.AppId) <= 0 {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("AppId"))
-	} else if len(c.AppId) > checkClientPlatformAppId {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("AppId"))
-	}
-	if len(c.AppName) <= 0 {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("AppName"))
-	} else if len(c.AppName) > checkClientPlatformAppName {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("AppName"))
-	}
-	//if len(c.Extra) > checkClientExtraNum {
-	//	errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("Extra"))
-	//}
-	for k, v := range c.Extra {
-		switch k {
-		case "socialLinks":
-			if len(v.(map[uint16]string)) > checkClientPlatformSocialLinksNum {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("socialLinks"))
-			}
-			for kk, vv := range v.(map[uint16]string) {
-				if len(vv) > checkClientPlatformSocialLinkLen {
-					errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix(fmt.Sprintf("socialLinks[%d] ", kk)))
-				}
-			}
-		case "marketHomes":
-			if len(v.(map[uint]string)) > checkClientPlatformMarketHomesNum {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("marketHomes"))
-			}
-			for kk, vv := range v.(map[uint]string) {
-				if len(vv) > checkClientPlatformMarketHomeLen {
-					errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix(fmt.Sprintf("marketHomes[%d] ", kk)))
-				}
-			}
-		case "iosId":
-			if len(v.(string)) > checkClientPlatformIosIdLen {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("iosId"))
-			}
-		default:
-			errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldUnDef).WithPrefix(k+" "))
-		}
-	}
-	return errors
-}
-
-func (c *ClientPlatform) GetPlatformName() string {
-	return platformName(c.Platform)
-}
-
-func (c *ClientPlatform) GetAreaName() string {
-	return areaName(c.Area)
 }
 
 // IsOnline 是否上线
@@ -250,6 +179,75 @@ func (c *ClientPlatform) GetLatestVersion(market uint16) *ClientVersion {
 		return v
 	}
 	return nil
+}
+
+const (
+	checkClientPlatformAppIdLen   = 100
+	checkClientPlatformAppNameLen = 100
+
+	checkClientPlatformSocialLinksNum = 100
+	checkClientPlatformSocialLinkLen  = 500
+	checkClientPlatformMarketHomesNum = 100
+	checkClientPlatformMarketHomeLen  = 500
+	checkClientPlatformIosIdLen       = 50
+)
+
+// CheckFields 检查字段
+func (c *ClientPlatform) CheckFields() []*tools.CodeError {
+	var errors []*tools.CodeError
+	if !isPlatformTypeOk(c.Platform) {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldRange).WithPrefix("Platform "))
+	}
+	if !isAreaTypeOk(c.Area) {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldRange).WithPrefix("Area "))
+	}
+	if len(c.AppId) <= 0 {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("AppId "))
+	} else if len(c.AppId) > checkClientPlatformAppIdLen {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("AppId "))
+	}
+	if len(c.AppName) <= 0 {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("AppName "))
+	} else if len(c.AppName) > checkClientPlatformAppNameLen {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("AppName "))
+	}
+	for k, v := range c.Extra {
+		switch k {
+		case "socialLinks":
+			if len(v.(map[uint16]string)) > checkClientPlatformSocialLinksNum {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("socialLinks "))
+			}
+			for kk, vv := range v.(map[uint16]string) {
+				if len(vv) > checkClientPlatformSocialLinkLen {
+					errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix(fmt.Sprintf("socialLinks[%d] ", kk)))
+				}
+			}
+		case "marketHomes":
+			if len(v.(map[uint]string)) > checkClientPlatformMarketHomesNum {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("marketHomes "))
+			}
+			for kk, vv := range v.(map[uint]string) {
+				if len(vv) > checkClientPlatformMarketHomeLen {
+					errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix(fmt.Sprintf("marketHomes[%d] ", kk)))
+				}
+			}
+		case "iosId":
+			if len(v.(string)) > checkClientPlatformIosIdLen {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("iosId "))
+			}
+		default:
+			errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldUnDef).WithPrefix(k+" "))
+		}
+	}
+	return errors
+}
+
+func (c *ClientPlatform) GetPlatformName() string {
+	return platformName(c.Platform)
+}
+
+func (c *ClientPlatform) GetAreaName() string {
+	return areaName(c.Area)
 }
 
 const (

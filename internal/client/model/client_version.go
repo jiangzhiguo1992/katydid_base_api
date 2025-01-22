@@ -1,12 +1,17 @@
 package model
 
 import (
+	"fmt"
 	"katydid_base_api/internal/pkg/database"
+	"katydid_base_api/internal/pkg/utils"
+	"katydid_base_api/tools"
 	"time"
 )
 
 const (
-	MarketTypeAdsMin uint = 1000
+	LimitLenClientVersionUrl    = 200
+	LimitLenClientVersionAppKey = 200
+	LimitLenClientVersionExtra  = 1000
 )
 
 // ClientVersion 客户端版本
@@ -22,7 +27,7 @@ type ClientVersion struct {
 
 	Url    string `json:"url"`    // 升级地址 (安装包地址，或market跳转地址)
 	Force  bool   `json:"force"`  // 是否强制升级
-	AppKey string `json:"appKey"` // app密钥 (终端使用，版本更替，确定后不可改) TODO:GG 在网关/代理层处理?
+	AppKey string `json:"appKey"` // app密钥 (终端使用，版本更替，确定后不可改) TODO:GG 不会返回给客户端，在网关/代理层处理?
 
 	Extra map[string]interface{} `json:"extra" gorm:"serializer:json"` // 额外信息
 }
@@ -32,11 +37,6 @@ func NewClientVersionDefault(
 	enable bool,
 	url string, force bool, appKey string,
 ) *ClientVersion {
-	if !isMarketTypeOk(market) {
-		return nil
-	} else if len(appKey) <= 0 {
-		return nil
-	}
 	return &ClientVersion{
 		BaseModel: database.NewBaseModelEmpty(),
 		CPid:      CPid, Market: market, Code: code,
@@ -44,16 +44,6 @@ func NewClientVersionDefault(
 		Url: url, Force: force, AppKey: appKey,
 		Extra: map[string]interface{}{},
 	}
-}
-
-func (c *ClientVersion) GetMarketName(platform uint16) string {
-	if c.Market < MarketTypeAdsMin {
-		return platformMarketName(platform, c.Market)
-	}
-	if c.Extra["marketName"] == nil {
-		return ""
-	}
-	return c.Extra["marketName"].(string)
 }
 
 func (c *ClientVersion) IsBuild() bool {
@@ -82,7 +72,7 @@ func (c *ClientVersion) GetName() string {
 
 // SetSize 安装包大小 (上传pkg的时候统计)
 func (c *ClientVersion) SetSize(size *uint64) {
-	if size != nil {
+	if (size != nil) && (*size >= 0) {
 		c.Extra["size"] = *size
 	} else {
 		delete(c.Extra, "size")
@@ -184,6 +174,94 @@ func (c *ClientVersion) SetMarketName(name string) {
 	c.Extra["marketName"] = name
 }
 
+func (c *ClientVersion) GetMarketName(platform uint16) string {
+	if c.Market < MarketTypeAdsMin {
+		return platformMarketName(platform, c.Market)
+	}
+	if c.Extra["marketName"] == nil {
+		return ""
+	}
+	return c.Extra["marketName"].(string)
+}
+
+const (
+	checkClientVersionUrlLen    = 500
+	checkClientVersionAppKeyLen = 100
+
+	checkClientVersionNameLen      = 100
+	checkClientVersionIconUrlLen   = 500
+	checkClientVersionCompactLen   = 100
+	checkClientVersionLogLen       = 10000
+	checkClientVersionImgUrlsNum   = 50
+	checkClientVersionImgUrlLen    = 500
+	checkClientVersionVideoUrlsNum = 50
+	checkClientVersionVideoUrlLen  = 500
+	checkClientVersionIosIdLen     = 50
+)
+
+// CheckFields 检查字段
+func (c *ClientVersion) CheckFields() []*tools.CodeError {
+	var errors []*tools.CodeError
+	if !isMarketTypeOk(c.Market) {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldRange).WithPrefix("Market "))
+	}
+	if len(c.Url) <= 0 {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("Url "))
+	} else if len(c.Url) > checkClientVersionUrlLen {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("Url "))
+	}
+	if len(c.AppKey) <= 0 {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("AppKey "))
+	} else if len(c.AppKey) > checkClientVersionAppKeyLen {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("AppKey "))
+	}
+	for k, v := range c.Extra {
+		switch k {
+		case "name":
+			if len(v.(string)) > checkClientVersionNameLen {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("name "))
+			}
+		case "iconUrl":
+			if len(v.(string)) > checkClientVersionIconUrlLen {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("iconUrl "))
+			}
+		case "compact":
+			if len(v.(string)) > checkClientVersionCompactLen {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("compact "))
+			}
+		case "log":
+			if len(v.(string)) > checkClientVersionLogLen {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("log "))
+			}
+		case "imgUrls":
+			if len(v.([]string)) > checkClientVersionImgUrlsNum {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("imgUrls "))
+			}
+			for kk, vv := range v.([]string) {
+				if len(vv) > checkClientVersionImgUrlLen {
+					errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix(fmt.Sprintf("imgUrls[%d] ", kk)))
+				}
+			}
+		case "videoUrls":
+			if len(v.([]string)) > checkClientVersionVideoUrlsNum {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("videoUrls "))
+			}
+			for kk, vv := range v.([]string) {
+				if len(vv) > checkClientVersionVideoUrlLen {
+					errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix(fmt.Sprintf("videoUrls[%d] ", kk)))
+				}
+			}
+		case "iosId":
+			if len(v.(string)) > checkClientVersionIosIdLen {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("iosId "))
+			}
+		default:
+			errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldUnDef).WithPrefix(k+" "))
+		}
+	}
+	return errors
+}
+
 const (
 	MarketTypeLinuxOfficial uint = 1
 	MarketTypeLinuxSteam    uint = 2
@@ -246,6 +324,8 @@ const (
 	//ItchIo     uint = 2
 	//KongReGate uint = 3
 	//IndieDb    uint = 4
+
+	MarketTypeAdsMin uint = 1000 // 大于这个的都是投量广告
 )
 
 var platformMarketInfos = map[uint16]map[uint]string{

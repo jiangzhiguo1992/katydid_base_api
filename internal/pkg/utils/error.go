@@ -17,7 +17,8 @@ const (
 	ErrorCodeDBFieldShort = 1008 // 短
 	ErrorCodeDBFieldMax   = 1009 // 数量大
 	ErrorCodeDBFieldMin   = 1010 // 数量小
-	ErrorCodeDBFieldUnDef = 1011
+	ErrorCodeDBFieldRange = 1011
+	ErrorCodeDBFieldUnDef = 1012
 	ErrorCodeDBDupPk      = 1001
 )
 
@@ -32,6 +33,7 @@ var errorMessages = map[int]string{
 	ErrorCodeDBFieldShort: "数据库字段过短",
 	ErrorCodeDBFieldMax:   "数据库字段数量过多",
 	ErrorCodeDBFieldMin:   "数据库字段数量过少",
+	ErrorCodeDBFieldRange: "数据库字段范围错误",
 	ErrorCodeDBFieldUnDef: "数据库字段未定义",
 	ErrorCodeDBDupPk:      "数据库唯一约束冲突",
 }

@@ -45,76 +45,6 @@ func NewClientDefault(
 	return client
 }
 
-const (
-	checkClientIPNameLen       = 100
-	checkClientOrganizationLen = 100
-
-	checkClientWebsiteLen    = 500
-	checkClientCopyrightsNum = 50
-	checkClientCopyrightLen  = 100
-	checkClientSupportUrlLen = 500
-	checkClientPrivacyUrlLen = 500
-	checkClientBulletinsNum  = 10000
-	checkClientBulletinLen   = 50000
-)
-
-func (c *Client) CheckFields() []*tools.CodeError {
-	var errors []*tools.CodeError
-	if len(c.IPName) <= 0 {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("IPName"))
-	} else if len(c.IPName) > checkClientIPNameLen {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("IPName"))
-	}
-	if len(c.Organization) <= 0 {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("Organization"))
-	} else if len(c.Organization) > checkClientOrganizationLen {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("Organization"))
-	}
-	//if len(c.Extra) > checkClientExtraNum {
-	//	errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("Extra"))
-	//}
-	for k, v := range c.Extra {
-		switch k {
-		case "website":
-			if len(v.(string)) > checkClientWebsiteLen {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("website "))
-			}
-		case "copyrights":
-			if len(v.([]string)) > checkClientCopyrightsNum {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("copyrights "))
-			}
-			for kk, vv := range v.([]string) {
-				if len(vv) > checkClientCopyrightLen {
-					errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix(fmt.Sprintf("copyrights[%d] ", kk)))
-				}
-			}
-		case "supportUrl":
-			if len(v.(string)) > checkClientSupportUrlLen {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("supportUrl "))
-			}
-		case "privacyUrl":
-			if len(v.(string)) > checkClientPrivacyUrlLen {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("privacyUrl "))
-			}
-		case "bulletins":
-			if len(v.([]string)) > checkClientBulletinsNum {
-				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("bulletins "))
-			}
-			for kk, vv := range v.([]string) {
-				if len(vv) > checkClientBulletinLen {
-					errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix(fmt.Sprintf("bulletins[%d] ", kk)))
-				}
-			}
-		case "userMaxAccount":
-		case "userMaxToken":
-			continue
-		default:
-			errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldUnDef).WithPrefix(k+" "))
-		}
-	}
-	return errors
-}
-
 // IsOnline 是否上线
 func (c *Client) IsOnline() bool {
 	currentTime := time.Now().UnixMilli()
@@ -290,4 +220,72 @@ func (c *Client) GetLatestCode(platform, area, market uint16) *ClientVersion {
 		return nil
 	}
 	return c.LatestCodes[platform][area][market]
+}
+
+const (
+	checkClientIPNameLen       = 100
+	checkClientOrganizationLen = 100
+
+	checkClientWebsiteLen    = 500
+	checkClientCopyrightsNum = 50
+	checkClientCopyrightLen  = 100
+	checkClientSupportUrlLen = 500
+	checkClientPrivacyUrlLen = 500
+	checkClientBulletinsNum  = 10000
+	checkClientBulletinLen   = 50000
+)
+
+// CheckFields 检查字段
+func (c *Client) CheckFields() []*tools.CodeError {
+	var errors []*tools.CodeError
+	if len(c.IPName) <= 0 {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("IPName"))
+	} else if len(c.IPName) > checkClientIPNameLen {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("IPName"))
+	}
+	if len(c.Organization) <= 0 {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("Organization"))
+	} else if len(c.Organization) > checkClientOrganizationLen {
+		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("Organization"))
+	}
+	for k, v := range c.Extra {
+		switch k {
+		case "website":
+			if len(v.(string)) > checkClientWebsiteLen {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("website "))
+			}
+		case "copyrights":
+			if len(v.([]string)) > checkClientCopyrightsNum {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("copyrights "))
+			}
+			for kk, vv := range v.([]string) {
+				if len(vv) > checkClientCopyrightLen {
+					errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix(fmt.Sprintf("copyrights[%d] ", kk)))
+				}
+			}
+		case "supportUrl":
+			if len(v.(string)) > checkClientSupportUrlLen {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("supportUrl "))
+			}
+		case "privacyUrl":
+			if len(v.(string)) > checkClientPrivacyUrlLen {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("privacyUrl "))
+			}
+		case "bulletins":
+			if len(v.([]string)) > checkClientBulletinsNum {
+				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("bulletins "))
+			}
+			for kk, vv := range v.([]string) {
+				if len(vv) > checkClientBulletinLen {
+					errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix(fmt.Sprintf("bulletins[%d] ", kk)))
+				}
+			}
+		case "userMaxAccount":
+		case "userMaxToken":
+			continue
+		default:
+			errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldUnDef).WithPrefix(k+" "))
+		}
+	}
+	return errors
 }
