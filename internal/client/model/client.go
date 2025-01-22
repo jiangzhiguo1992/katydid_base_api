@@ -2,7 +2,7 @@ package model
 
 import (
 	"fmt"
-	"katydid_base_api/internal/pkg/database"
+	"katydid_base_api/internal/pkg/base"
 	"katydid_base_api/internal/pkg/utils"
 	"katydid_base_api/tools"
 	"time"
@@ -10,7 +10,7 @@ import (
 
 // Client 客户端
 type Client struct {
-	*database.BaseModel
+	*base.DBModel
 	IP   uint `json:"IP"`   // 系列 (eg:大富翁IP)
 	Part uint `json:"part"` // 类型 (eg:单机版)
 
@@ -33,8 +33,8 @@ func NewClientDefault(
 	IPName string, organization string,
 ) *Client {
 	client := &Client{
-		BaseModel: database.NewBaseModelEmpty(),
-		IP:        IP, Part: part,
+		DBModel: base.NewDBModelEmpty(),
+		IP:      IP, Part: part,
 		Enable: enable, OnlineAt: -1, OfflineAt: -1,
 		IPName: IPName, Organization: organization,
 		Extra:       map[string]interface{}{},

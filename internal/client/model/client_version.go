@@ -2,7 +2,7 @@ package model
 
 import (
 	"fmt"
-	"katydid_base_api/internal/pkg/database"
+	"katydid_base_api/internal/pkg/base"
 	"katydid_base_api/internal/pkg/utils"
 	"katydid_base_api/tools"
 	"time"
@@ -10,7 +10,7 @@ import (
 
 // ClientVersion 客户端版本
 type ClientVersion struct {
-	*database.BaseModel
+	*base.DBModel
 	CPid   uint64 `json:"cpid"`   // 客户端平台id
 	Market uint   `json:"market"` // 市场/渠道/投放
 	Code   uint   `json:"code"`   // 版本标识
@@ -32,8 +32,8 @@ func NewClientVersionDefault(
 	url string, force bool, appKey string,
 ) *ClientVersion {
 	return &ClientVersion{
-		BaseModel: database.NewBaseModelEmpty(),
-		CPid:      CPid, Market: market, Code: code,
+		DBModel: base.NewDBModelEmpty(),
+		CPid:    CPid, Market: market, Code: code,
 		Enable: enable, BuildAt: -1, PublishAt: -1,
 		Url: url, Force: force, AppKey: appKey,
 		Extra: map[string]interface{}{},

@@ -2,7 +2,7 @@ package model
 
 import (
 	"fmt"
-	"katydid_base_api/internal/pkg/database"
+	"katydid_base_api/internal/pkg/base"
 	"katydid_base_api/internal/pkg/utils"
 	"katydid_base_api/tools"
 	"time"
@@ -10,7 +10,7 @@ import (
 
 // ClientPlatform 客户端平台
 type ClientPlatform struct {
-	*database.BaseModel
+	*base.DBModel
 	Cid      uint64 `json:"cid"`      // 客户端id TODO:GG idx
 	Platform uint16 `json:"platform"` // 平台 TODO:GG idx_1
 	Area     uint16 `json:"area"`     // 区域编号 TODO:GG idx_1
@@ -33,8 +33,8 @@ func NewClientPlatformDefault(
 	appId string, appName string,
 ) *ClientPlatform {
 	return &ClientPlatform{
-		BaseModel: database.NewBaseModelEmpty(),
-		Cid:       Cid, Platform: platform, Area: area,
+		DBModel: base.NewDBModelEmpty(),
+		Cid:     Cid, Platform: platform, Area: area,
 		Enable: enable, OnlineAt: -1, OfflineAt: -1,
 		AppId: appId, AppName: appName,
 		Extra:         map[string]interface{}{},
