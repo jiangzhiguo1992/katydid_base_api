@@ -7,12 +7,12 @@ import (
 )
 
 const (
-	ModuleTag = "module"
-	ClientTag = "client"
+	tagModule = "module"
+	tagClient = "client"
 
-	EnableKey = "enable"
-	CloudKey  = "cloud"
-	ProdKey   = "prod"
+	keyEnable = "enable"
+	keyCloud  = "cloud"
+	keyProd   = "prod"
 )
 
 var (
@@ -60,8 +60,8 @@ func GetClient() *ClientConfig {
 }
 
 func RefreshClient() *ClientConfig {
-	module := newModule(ClientTag)
-	pgSql := newPgSql(module.prod, ClientTag)
+	module := newModule(tagClient)
+	pgSql := newPgSql(module.prod, tagClient)
 
 	client = &ClientConfig{
 		ModuleConfig: module,
@@ -72,21 +72,21 @@ func RefreshClient() *ClientConfig {
 
 func newModule(subTag string) *ModuleConfig {
 	module := &ModuleConfig{}
-	tag := fmt.Sprintf("%s.%s", ModuleTag, subTag)
-	if viper.IsSet(fmt.Sprintf("%s.%s", tag, EnableKey)) {
-		module.enable = viper.GetBool(fmt.Sprintf("%s.%s", tag, EnableKey))
+	tag := fmt.Sprintf("%s.%s", tagModule, subTag)
+	if viper.IsSet(fmt.Sprintf("%s.%s", tag, keyEnable)) {
+		module.enable = viper.GetBool(fmt.Sprintf("%s.%s", tag, keyEnable))
 	} else {
-		module.enable = viper.GetBool(tools.ModuleEnableKey)
+		module.enable = viper.GetBool(tools.ConfigKeyAppEnable)
 	}
-	if viper.IsSet(fmt.Sprintf("%s.%s", tag, CloudKey)) {
-		module.cloud = viper.GetBool(fmt.Sprintf("%s.%s", tag, CloudKey))
+	if viper.IsSet(fmt.Sprintf("%s.%s", tag, keyCloud)) {
+		module.cloud = viper.GetBool(fmt.Sprintf("%s.%s", tag, keyCloud))
 	} else {
-		module.cloud = viper.GetBool(tools.ModuleCloudKey)
+		module.cloud = viper.GetBool(tools.ConfigKeyAppCloud)
 	}
-	if viper.IsSet(fmt.Sprintf("%s.%s", tag, ProdKey)) {
-		module.prod = viper.GetBool(fmt.Sprintf("%s.%s", tag, ProdKey))
+	if viper.IsSet(fmt.Sprintf("%s.%s", tag, keyProd)) {
+		module.prod = viper.GetBool(fmt.Sprintf("%s.%s", tag, keyProd))
 	} else {
-		module.prod = viper.GetBool(tools.ModuleProdKey)
+		module.prod = viper.GetBool(tools.ConfigKeyAppProd)
 	}
 	return module
 }

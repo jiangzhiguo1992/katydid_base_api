@@ -6,7 +6,7 @@ import (
 
 func init() {
 	// configs
-	_, prod := tools.InitConfigs()
+	_, _, prod := tools.InitConfigs()
 
 	// logger
 	tools.InitLogger(prod)

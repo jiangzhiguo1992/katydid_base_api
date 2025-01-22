@@ -20,9 +20,9 @@ const (
 	keyCloud  = "cloud"  // 云端配置 (云端加载，被ignore)
 	keySecret = "secret" // 秘密配置 (始终加载，被ignore)
 
-	AppEnableKey = "app.enable" // 按照规则写
-	AppCloudKey  = "app.cloud"  // 按照规则写
-	AppProdKey   = "app.prod"   // 按照规则写
+	ConfigKeyAppEnable = "app.enable" // 按照规则写
+	ConfigKeyAppCloud  = "app.cloud"  // 按照规则写
+	ConfigKeyAppProd   = "app.prod"   // 按照规则写
 )
 
 // InitConfigs 初始化配置
@@ -33,7 +33,7 @@ func InitConfigs() (bool, bool, bool) {
 	for _, f := range mapFiles[keyInit] {
 		settings = setUpConfig(false, f[0], f[1], f[2])
 	}
-	enable, cloud, prod := viper.GetBool(AppEnableKey), viper.GetBool(AppCloudKey), viper.GetBool(AppProdKey)
+	enable, cloud, prod := viper.GetBool(ConfigKeyAppEnable), viper.GetBool(ConfigKeyAppCloud), viper.GetBool(ConfigKeyAppProd)
 	viper.Reset()
 
 	others := append(mapFiles[keyCommon], mapFiles[keySecret]...)
