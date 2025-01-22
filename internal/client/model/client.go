@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"katydid_base_api/internal/pkg/database"
 	"katydid_base_api/internal/pkg/utils"
 	"katydid_base_api/tools"
@@ -45,62 +46,63 @@ func NewClientDefault(
 }
 
 const (
-	CheckClientIPNameLen       = 100
-	CheckClientOrganizationLen = 100
-	CheckClientWebsiteLen      = 10
-	CheckClientCopyrightsNum   = 500
-	CheckClientCopyrightLen    = 500
-	CheckClientSupportUrlLen   = 500
-	CheckClientPrivacyUrlLen   = 500
-	CheckClientBulletinsNum    = 500
-	CheckClientBulletinLen     = 10000
+	checkClientIPNameLen       = 100
+	checkClientOrganizationLen = 100
+
+	checkClientWebsiteLen    = 500
+	checkClientCopyrightsNum = 50
+	checkClientCopyrightLen  = 100
+	checkClientSupportUrlLen = 500
+	checkClientPrivacyUrlLen = 500
+	checkClientBulletinsNum  = 10000
+	checkClientBulletinLen   = 50000
 )
 
 func (c *Client) CheckFields() []*tools.CodeError {
 	var errors []*tools.CodeError
 	if len(c.IPName) <= 0 {
 		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("IPName"))
-	} else if len(c.IPName) > CheckClientIPNameLen {
+	} else if len(c.IPName) > checkClientIPNameLen {
 		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("IPName"))
 	}
 	if len(c.Organization) <= 0 {
 		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("Organization"))
-	} else if len(c.Organization) > CheckClientOrganizationLen {
+	} else if len(c.Organization) > checkClientOrganizationLen {
 		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("Organization"))
 	}
-	//if len(c.Extra) > CheckClientExtraNum {
+	//if len(c.Extra) > checkClientExtraNum {
 	//	errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("Extra"))
 	//}
 	for k, v := range c.Extra {
 		switch k {
 		case "website":
-			if len(v.(string)) > CheckClientWebsiteLen {
+			if len(v.(string)) > checkClientWebsiteLen {
 				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("website "))
 			}
 		case "copyrights":
-			if len(v.([]string)) > CheckClientCopyrightsNum {
+			if len(v.([]string)) > checkClientCopyrightsNum {
 				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("copyrights "))
 			}
-			for _, copyright := range v.([]string) {
-				if len(copyright) > CheckClientCopyrightLen {
-					errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("copyright "))
+			for kk, vv := range v.([]string) {
+				if len(vv) > checkClientCopyrightLen {
+					errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix(fmt.Sprintf("copyrights[%d] ", kk)))
 				}
 			}
 		case "supportUrl":
-			if len(v.(string)) > CheckClientSupportUrlLen {
+			if len(v.(string)) > checkClientSupportUrlLen {
 				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("supportUrl "))
 			}
 		case "privacyUrl":
-			if len(v.(string)) > CheckClientPrivacyUrlLen {
+			if len(v.(string)) > checkClientPrivacyUrlLen {
 				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("privacyUrl "))
 			}
 		case "bulletins":
-			if len(v.([]string)) > CheckClientBulletinsNum {
+			if len(v.([]string)) > checkClientBulletinsNum {
 				errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldMax).WithPrefix("bulletins "))
 			}
-			for _, bulletin := range v.([]string) {
-				if len(bulletin) > CheckClientBulletinLen {
-					errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("bulletin "))
+			for kk, vv := range v.([]string) {
+				if len(vv) > checkClientBulletinLen {
+					errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix(fmt.Sprintf("bulletins[%d] ", kk)))
 				}
 			}
 		case "userMaxAccount":
