@@ -44,25 +44,25 @@ func NewClientDefault(
 
 // IsOnline 是否上线
 func (c *Client) IsOnline() bool {
-	currentTime := time.Now().Unix()
+	currentTime := time.Now().UnixMilli()
 	return (c.OnlineAt > 0 && (c.OnlineAt <= currentTime)) && (c.OfflineAt == -1 || c.OfflineAt > currentTime)
 }
 
 // IsOffline 是否下线
 func (c *Client) IsOffline() bool {
-	currentTime := time.Now().Unix()
+	currentTime := time.Now().UnixMilli()
 	return (c.OfflineAt > 0 && (c.OfflineAt <= currentTime)) && (c.OnlineAt == -1 || c.OnlineAt > currentTime)
 }
 
 // IsComingOnline 是否即将上线
 func (c *Client) IsComingOnline() bool {
-	currentTime := time.Now().Unix()
+	currentTime := time.Now().UnixMilli()
 	return c.OnlineAt > currentTime && (c.OfflineAt == -1 || c.OfflineAt < currentTime)
 }
 
 // IsComingOffline 是否即将下线
 func (c *Client) IsComingOffline() bool {
-	currentTime := time.Now().Unix()
+	currentTime := time.Now().UnixMilli()
 	return c.OfflineAt > currentTime && (c.OnlineAt == -1 || c.OnlineAt < currentTime)
 }
 

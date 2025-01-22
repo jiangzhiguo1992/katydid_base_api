@@ -39,6 +39,7 @@ func DB() *gorm.DB {
 	return conn
 }
 
+// RefreshDB TODO:GG 什么时候调用，怎么保持断了重连?
 func RefreshDB(ctx context.Context) {
 	if conn != nil {
 		err := database.DisConnPgSql(conn)
@@ -50,6 +51,6 @@ func RefreshDB(ctx context.Context) {
 	conn = database.ConnPgSql(ctx, config.PgSql)
 }
 
-func tableName(table string) string {
+func pgsqlTableName(table string) string {
 	return fmt.Sprintf("%s.%s", scheme, table)
 }

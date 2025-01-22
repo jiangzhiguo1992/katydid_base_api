@@ -8,7 +8,7 @@ import (
 )
 
 func Table() (tx *gorm.DB) {
-	return DB().Table(tableName(tClient))
+	return DB().Table(pgsqlTableName(tClient))
 }
 
 func InsertClient(client *model.Client) *tools.CodeError {

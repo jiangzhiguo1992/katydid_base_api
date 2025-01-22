@@ -46,72 +46,26 @@ func NewClientPlatformDefault(
 
 // IsOnline 是否上线
 func (c *ClientPlatform) IsOnline() bool {
-	currentTime := time.Now().Unix()
+	currentTime := time.Now().UnixMilli()
 	return (c.OnlineAt > 0 && (c.OnlineAt <= currentTime)) && (c.OfflineAt == -1 || c.OfflineAt > currentTime)
 }
 
 // IsOffline 是否下线
 func (c *ClientPlatform) IsOffline() bool {
-	currentTime := time.Now().Unix()
+	currentTime := time.Now().UnixMilli()
 	return (c.OfflineAt > 0 && (c.OfflineAt <= currentTime)) && (c.OnlineAt == -1 || c.OnlineAt > currentTime)
 }
 
 // IsComingOnline 是否即将上线
 func (c *ClientPlatform) IsComingOnline() bool {
-	currentTime := time.Now().Unix()
+	currentTime := time.Now().UnixMilli()
 	return c.OnlineAt > currentTime && (c.OfflineAt == -1 || c.OfflineAt < currentTime)
 }
 
 // IsComingOffline 是否即将下线
 func (c *ClientPlatform) IsComingOffline() bool {
-	currentTime := time.Now().Unix()
+	currentTime := time.Now().UnixMilli()
 	return c.OfflineAt > currentTime && (c.OnlineAt == -1 || c.OnlineAt < currentTime)
-}
-
-// SetMarketHomes 应用市场页面 (方便控制台跳转)
-func (c *ClientPlatform) SetMarketHomes(marketHomes *map[uint16]string) int {
-	var count int
-	if (marketHomes != nil) && (len(*marketHomes) > 0) {
-		for k := range *marketHomes {
-			ok := c.SetMarketHome(k, (*marketHomes)[k])
-			if ok {
-				count++
-			}
-		}
-	} else {
-		delete(c.Extra, "marketHomes")
-	}
-	return count
-}
-
-func (c *ClientPlatform) SetMarketHome(tp uint16, market string) bool {
-	if !isMarketTypeOk(c.Platform, tp) {
-		return false
-	} else if len(market) <= 0 {
-		if c.Extra["marketHomes"] != nil {
-			delete((c.Extra["marketHomes"]).(map[uint16]string), tp)
-		}
-		return true
-	}
-	if c.Extra["marketHomes"] == nil {
-		c.Extra["marketHomes"] = map[uint16]string{}
-	}
-	(c.Extra["marketHomes"]).(map[uint16]string)[tp] = market
-	return true
-}
-
-func (c *ClientPlatform) GetMarketHomes() map[uint16]string {
-	if c.Extra["marketHomes"] == nil {
-		return map[uint16]string{}
-	}
-	return (c.Extra["marketHomes"]).(map[uint16]string)
-}
-
-func (c *ClientPlatform) GetMarket(tp uint16) string {
-	if v, ok := c.GetMarketHomes()[tp]; ok {
-		return v
-	}
-	return ""
 }
 
 // SetSocialLinks 社交链接 (方便控制台跳转)
@@ -155,6 +109,52 @@ func (c *ClientPlatform) GetSocialLinks() map[uint16]string {
 
 func (c *ClientPlatform) GetSocialLink(tp uint16) string {
 	if v, ok := c.GetSocialLinks()[tp]; ok {
+		return v
+	}
+	return ""
+}
+
+// SetMarketHomes 应用市场页面 (方便控制台跳转)
+func (c *ClientPlatform) SetMarketHomes(marketHomes *map[uint]string) int {
+	var count int
+	if (marketHomes != nil) && (len(*marketHomes) > 0) {
+		for k := range *marketHomes {
+			ok := c.SetMarketHome(k, (*marketHomes)[k])
+			if ok {
+				count++
+			}
+		}
+	} else {
+		delete(c.Extra, "marketHomes")
+	}
+	return count
+}
+
+func (c *ClientPlatform) SetMarketHome(tp uint, market string) bool {
+	if !isMarketTypeOk(c.Platform, tp) {
+		return false
+	} else if len(market) <= 0 {
+		if c.Extra["marketHomes"] != nil {
+			delete((c.Extra["marketHomes"]).(map[uint]string), tp)
+		}
+		return true
+	}
+	if c.Extra["marketHomes"] == nil {
+		c.Extra["marketHomes"] = map[uint]string{}
+	}
+	(c.Extra["marketHomes"]).(map[uint]string)[tp] = market
+	return true
+}
+
+func (c *ClientPlatform) GetMarketHomes() map[uint]string {
+	if c.Extra["marketHomes"] == nil {
+		return map[uint]string{}
+	}
+	return (c.Extra["marketHomes"]).(map[uint]string)
+}
+
+func (c *ClientPlatform) GetMarket(tp uint) string {
+	if v, ok := c.GetMarketHomes()[tp]; ok {
 		return v
 	}
 	return ""
