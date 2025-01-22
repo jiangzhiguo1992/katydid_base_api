@@ -1,4 +1,4 @@
-package db
+package middleware
 
 import (
 	"context"

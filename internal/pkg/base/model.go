@@ -1,4 +1,4 @@
-package db
+package base
 
 import (
 	"gorm.io/gorm"
@@ -6,7 +6,7 @@ import (
 )
 
 type (
-	BaseModel struct {
+	DBModel struct {
 		Id       uint64 `json:"id"`
 		CreateAt int64  `json:"createAt" gorm:"autoCreateTime:milli"`
 		UpdateAt int64  `json:"updateAt" gorm:"autoUpdateTime:milli"`
@@ -16,21 +16,21 @@ type (
 	}
 )
 
-func NewBaseModel(
+func NewDBModel(
 	id uint64, createAt int64, updateAt int64,
 	fieldsCheck func() []*tools.CodeError,
-) *BaseModel {
-	return &BaseModel{
+) *DBModel {
+	return &DBModel{
 		Id: id, CreateAt: createAt, UpdateAt: updateAt, DeleteAt: nil,
 		FieldsCheck: fieldsCheck,
 	}
 }
 
-func NewBaseModelEmpty() *BaseModel {
-	return &BaseModel{}
+func NewDBModelEmpty() *DBModel {
+	return &DBModel{}
 }
 
-func (b *BaseModel) BeforeSave(tx *gorm.DB) (err error) {
+func (b *DBModel) BeforeSave(tx *gorm.DB) (err error) {
 	if b.FieldsCheck == nil {
 		return nil
 	}
