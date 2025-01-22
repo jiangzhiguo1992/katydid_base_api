@@ -12,7 +12,7 @@ type (
 		UpdateAt int64  `json:"updateAt" gorm:"autoUpdateTime:milli"`
 		DeleteAt *int64 // invisible TODO:GG 所有的查询都带上index
 
-		FieldsCheck func() []*tools.CodeError
+		FieldsCheck func() []*tools.CodeError `json:"-" gorm:"-:all"`
 	}
 )
 

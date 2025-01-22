@@ -5,6 +5,7 @@ import (
 	"katydid_base_api/internal/client/model"
 	"katydid_base_api/internal/pkg/utils"
 	"katydid_base_api/tools"
+	"strings"
 )
 
 func Table() (tx *gorm.DB) {
@@ -13,19 +14,19 @@ func Table() (tx *gorm.DB) {
 
 func InsertClient(client *model.Client) *tools.CodeError {
 	if client == nil {
-		return utils.MatchErrorCode(utils.ErrorCodeInsertNil)
+		return utils.MatchErrorByCode(utils.ErrorCodeDBInsNil)
 	}
 	err := Table().Create(client).Error
-	return utils.MatchCodeError(err)
+	return utils.MatchErrorByErr(err)
 }
 
-func SelectClient(id int64) (*model.Client, error) {
+func SelectClient(id uint64) (*model.Client, *tools.CodeError) {
 	var client model.Client
 	err := Table().First(&client, id).Error
-	if err != nil {
-		return nil, err
+	if (err != nil) && strings.Contains(err.Error(), "record not found") {
+		return nil, nil
 	}
-	return &client, nil
+	return &client, utils.MatchErrorByErr(err)
 }
 
 func UpdateClient(client *model.Client) error {

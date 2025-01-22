@@ -8,12 +8,6 @@ import (
 	"time"
 )
 
-const (
-	LimitLenClientVersionUrl    = 200
-	LimitLenClientVersionAppKey = 200
-	LimitLenClientVersionExtra  = 1000
-)
-
 // ClientVersion 客户端版本
 type ClientVersion struct {
 	*database.BaseModel
