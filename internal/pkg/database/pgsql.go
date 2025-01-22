@@ -85,12 +85,12 @@ func DisConnPgSql(db *gorm.DB) error {
 	sqlDB, err := db.DB()
 	if err != nil {
 		tools.Error("PgSql 断开连接失败, 获取连接失败", zap.Error(err))
-		return tools.NewMultiError(err).WrapError(errors.New("PgSql 断开连接失败, 获取连接失败"))
+		return tools.NewMultiCodeError(err).WrapError(errors.New("PgSql 断开连接失败, 获取连接失败"))
 	}
 	err = sqlDB.Close()
 	if err != nil {
 		tools.Error("PgSql 断开连接失败, 关闭连接失败", zap.Error(err))
-		return tools.NewMultiError(err).WrapError(errors.New("PgSql 断开连接失败, 关闭连接失败"))
+		return tools.NewMultiCodeError(err).WrapError(errors.New("PgSql 断开连接失败, 关闭连接失败"))
 	}
 	tools.Info("PgSql 断开连接成功")
 	return nil

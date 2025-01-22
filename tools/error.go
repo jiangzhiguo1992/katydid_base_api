@@ -4,22 +4,22 @@ import (
 	"fmt"
 )
 
-// MultiError 是一个可以包裹多层错误的结构体
-type MultiError struct {
+// MultiCodeError 是一个可以包裹多层错误的结构体
+type MultiCodeError struct {
 	Code   int
 	Errors []*CodeError
 }
 
-func NewMultiError(err error) *MultiError {
-	return &MultiError{Code: 0, Errors: []*CodeError{NewCodeError(err)}}
+func NewMultiCodeError(err error) *MultiCodeError {
+	return &MultiCodeError{Code: 0, Errors: []*CodeError{NewCodeError(err)}}
 }
 
-func (m *MultiError) WithCode(code int) *MultiError {
+func (m *MultiCodeError) WithCode(code int) *MultiCodeError {
 	m.Code = code
 	return m
 }
 
-func (m *MultiError) Error() string {
+func (m *MultiCodeError) Error() string {
 	if len(m.Errors) == 0 {
 		return ""
 	}
@@ -31,17 +31,17 @@ func (m *MultiError) Error() string {
 }
 
 // WrapError 包裹一个新的错误
-func (m *MultiError) WrapError(err error) *MultiError {
+func (m *MultiCodeError) WrapError(err error) *MultiCodeError {
 	return m.WrapCodeError(NewCodeError(err))
 }
 
-func (m *MultiError) WrapCodeError(err *CodeError) *MultiError {
+func (m *MultiCodeError) WrapCodeError(err *CodeError) *MultiCodeError {
 	m.Errors = append(m.Errors, err)
 	return m
 }
 
 // Unwrap 返回第一个错误
-func (m *MultiError) Unwrap() error {
+func (m *MultiCodeError) Unwrap() error {
 	if len(m.Errors) > 0 {
 		return m.Errors[0]
 	}
