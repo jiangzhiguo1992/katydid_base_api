@@ -11,16 +11,16 @@ import (
 // ClientPlatform 客户端平台
 type ClientPlatform struct {
 	*base.DBModel
-	Cid      uint64 `json:"cid"`      // 客户端id TODO:GG idx
-	Platform uint16 `json:"platform"` // 平台 TODO:GG idx_1
-	Area     uint16 `json:"area"`     // 区域编号 TODO:GG idx_1
+	Cid      uint64 `json:"cid"`      // 客户端id
+	Platform uint16 `json:"platform"` // 平台
+	Area     uint16 `json:"area"`     // 区域编号
 
-	Enable    bool  `json:"enable"`    // 是否可用 (一般不用，下架之类的，没有reason) TODO:GG idx
-	OnlineAt  int64 `json:"onlineAt"`  // 上线时间 (时间没到时，只能停留在首页，提示bulletins) TODO:GG idx
-	OfflineAt int64 `json:"offlineAt"` // 下线时间 (时间到后，强制下线+升级/等待/...) TODO:GG idx
+	Enable    bool  `json:"enable"`    // 是否可用 (一般不用，下架之类的，没有reason)
+	OnlineAt  int64 `json:"onlineAt"`  // 上线时间 (时间没到时，只能停留在首页，提示bulletins)
+	OfflineAt int64 `json:"offlineAt"` // 下线时间 (时间到后，强制下线+升级/等待/...)
 
-	AppId   string `json:"appId"`   // 各平台应用唯一标识 (pkg/bundle，海外和大陆可以同时安装!) TODO:GG idx
-	AppName string `json:"appName"` // app名称 (不同Area的区别) TODO:GG idx
+	AppId   string `json:"appId"`   // 各平台应用唯一标识 (pkg/bundle，海外和大陆可以同时安装!)
+	AppName string `json:"appName"` // app名称 (不同Area的区别)
 
 	Extra map[string]interface{} `json:"extra" gorm:"serializer:json"` // 额外信息
 
