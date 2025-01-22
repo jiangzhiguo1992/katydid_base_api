@@ -44,6 +44,14 @@ func NewClientPlatformDefault(
 	}
 }
 
+func (c *ClientPlatform) GetPlatformName() string {
+	return platformName(c.Platform)
+}
+
+func (c *ClientPlatform) GetAreaName() string {
+	return areaName(c.Area)
+}
+
 // IsOnline 是否上线
 func (c *ClientPlatform) IsOnline() bool {
 	currentTime := time.Now().UnixMilli()
@@ -84,19 +92,19 @@ func (c *ClientPlatform) SetSocialLinks(socialLinks *map[uint16]string) int {
 	return count
 }
 
-func (c *ClientPlatform) SetSocialLink(tp uint16, socialLink string) bool {
-	if !isSocialLinkTypeOk(tp) {
+func (c *ClientPlatform) SetSocialLink(social uint16, link string) bool {
+	if !isSocialLinkTypeOk(social) {
 		return false
-	} else if len(socialLink) <= 0 {
+	} else if len(link) <= 0 {
 		if c.Extra["socialLinks"] != nil {
-			delete((c.Extra["socialLinks"]).(map[uint16]string), tp)
+			delete((c.Extra["socialLinks"]).(map[uint16]string), social)
 		}
 		return true
 	}
 	if c.Extra["socialLinks"] == nil {
 		c.Extra["socialLinks"] = map[uint16]string{}
 	}
-	(c.Extra["socialLinks"]).(map[uint16]string)[tp] = socialLink
+	(c.Extra["socialLinks"]).(map[uint16]string)[social] = link
 	return true
 }
 
@@ -107,11 +115,11 @@ func (c *ClientPlatform) GetSocialLinks() map[uint16]string {
 	return (c.Extra["socialLinks"]).(map[uint16]string)
 }
 
-func (c *ClientPlatform) GetSocialLink(tp uint16) string {
-	if v, ok := c.GetSocialLinks()[tp]; ok {
-		return v
+func (c *ClientPlatform) GetSocialLink(social uint16) (string, string) {
+	if v, ok := c.GetSocialLinks()[social]; ok {
+		return socialLinkName(social), v
 	}
-	return ""
+	return "", ""
 }
 
 // SetMarketHomes 应用市场页面 (方便控制台跳转)
@@ -130,19 +138,19 @@ func (c *ClientPlatform) SetMarketHomes(marketHomes *map[uint]string) int {
 	return count
 }
 
-func (c *ClientPlatform) SetMarketHome(tp uint, market string) bool {
-	if !isMarketTypeOk(c.Platform, tp) {
+func (c *ClientPlatform) SetMarketHome(market uint, home string) bool {
+	if !isPlatformMarketTypeOk(c.Platform, market) {
 		return false
-	} else if len(market) <= 0 {
+	} else if len(home) <= 0 {
 		if c.Extra["marketHomes"] != nil {
-			delete((c.Extra["marketHomes"]).(map[uint]string), tp)
+			delete((c.Extra["marketHomes"]).(map[uint]string), market)
 		}
 		return true
 	}
 	if c.Extra["marketHomes"] == nil {
 		c.Extra["marketHomes"] = map[uint]string{}
 	}
-	(c.Extra["marketHomes"]).(map[uint]string)[tp] = market
+	(c.Extra["marketHomes"]).(map[uint]string)[market] = home
 	return true
 }
 
@@ -153,11 +161,11 @@ func (c *ClientPlatform) GetMarketHomes() map[uint]string {
 	return (c.Extra["marketHomes"]).(map[uint]string)
 }
 
-func (c *ClientPlatform) GetMarket(tp uint) string {
-	if v, ok := c.GetMarketHomes()[tp]; ok {
-		return v
+func (c *ClientPlatform) GetMarketHome(market uint) (string, string) {
+	if v, ok := c.GetMarketHomes()[market]; ok {
+		return platformMarketName(c.Platform, market), v
 	}
-	return ""
+	return "", ""
 }
 
 // SetIosId apple应用市场id

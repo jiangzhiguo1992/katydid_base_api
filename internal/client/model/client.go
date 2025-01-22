@@ -15,6 +15,7 @@ type Client struct {
 	OnlineAt  int64 `json:"onlineAt"`  // 上线时间 (时间没到时，只能停留在首页，提示bulletins)
 	OfflineAt int64 `json:"offlineAt"` // 下线时间 (时间到后，强制下线+升级/等待/...)
 
+	IPName       string `json:"IPName"`       // ip名称
 	Organization string `json:"organization"` // 组织
 
 	Extra map[string]interface{} `json:"extra" gorm:"serializer:json"` // 额外信息
@@ -26,7 +27,7 @@ type Client struct {
 func NewClientDefault(
 	IP uint, part uint,
 	enable bool,
-	organization string,
+	IPName string, organization string,
 ) *Client {
 	if len(organization) <= 0 {
 		return nil
@@ -35,10 +36,10 @@ func NewClientDefault(
 		BaseModel: database.NewBaseModelEmpty(),
 		IP:        IP, Part: part,
 		Enable: enable, OnlineAt: -1, OfflineAt: -1,
-		Organization: organization,
-		Extra:        map[string]interface{}{},
-		Platforms:    make(map[uint16]map[uint16]*ClientPlatform),
-		LatestCodes:  make(map[uint16]map[uint16]map[uint16]*ClientVersion),
+		IPName: IPName, Organization: organization,
+		Extra:       map[string]interface{}{},
+		Platforms:   make(map[uint16]map[uint16]*ClientPlatform),
+		LatestCodes: make(map[uint16]map[uint16]map[uint16]*ClientVersion),
 	}
 }
 
