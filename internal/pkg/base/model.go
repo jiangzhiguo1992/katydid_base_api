@@ -7,27 +7,37 @@ import (
 
 type (
 	DBModel struct {
-		Id       uint64 `json:"id"`
+		//gorm.Model
+		Id       uint64 `json:"id" gorm:"primarykey"`
 		CreateAt int64  `json:"createAt" gorm:"autoCreateTime:milli"`
 		UpdateAt int64  `json:"updateAt" gorm:"autoUpdateTime:milli"`
-		DeleteAt *int64 // invisible TODO:GG 所有的查询都带上index
+
+		// TODO:GG 所有的查询都带上index `gorm:"index"`
+		DeleteBy int64  `json:"deleteBy"` // <-1=管理员 -1=系统 0=未删除 1=自己 >1=用户
+		DeleteAt *int64 `json:"deleteAt"`
 
 		FieldsCheck func() []*tools.CodeError `json:"-" gorm:"-:all"`
 	}
 )
 
-func NewDBModel(
-	id uint64, createAt int64, updateAt int64,
-	fieldsCheck func() []*tools.CodeError,
-) *DBModel {
-	return &DBModel{
-		Id: id, CreateAt: createAt, UpdateAt: updateAt, DeleteAt: nil,
-		FieldsCheck: fieldsCheck,
-	}
-}
+//func NewDBModel(
+//	id uint64, createAt int64, updateAt int64,
+//	fieldsCheck func() []*tools.CodeError,
+//) *DBModel {
+//	return &DBModel{
+//		Id: id, CreateAt: createAt, UpdateAt: updateAt, DeleteAt: nil,
+//		FieldsCheck: fieldsCheck,
+//	}
+//}
 
 func NewDBModelEmpty() *DBModel {
-	return &DBModel{}
+	return &DBModel{
+		//Id: nil,
+		//CreateAt: time.Now().UnixMilli(),
+		//UpdateAt: time.Now().UnixMilli(),
+		DeleteBy: 0,
+		DeleteAt: nil,
+	}
 }
 
 func (b *DBModel) BeforeSave(tx *gorm.DB) (err error) {
