@@ -20,31 +20,12 @@ type Client struct {
 	OfflineAt int64 `json:"offlineAt"` // 下线时间 (时间到后，强制下线+升级/等待/...)
 
 	IPName string `json:"IPName"` // ip名称
-	//Organization string `json:"organization"` // 组织
 
 	Extra map[string]interface{} `json:"extra" gorm:"serializer:json"` // 额外信息
 
 	Platforms   map[uint16]map[uint16]*ClientPlatform           `json:"platforms" gorm:"-:all"`   // [platform][area]平台列表
 	LatestCodes map[uint16]map[uint16]map[uint16]*ClientVersion `json:"latestCodes" gorm:"-:all"` // [platform][area][market]最新publish版本号
 }
-
-//func NewClientDefault(
-//	IP uint, part uint,
-//	enable bool,
-//	IPName string, organization string,
-//) *Client {
-//	client := &Client{
-//		DBModel: base.NewDBModelEmpty(),
-//		IP:      IP, Part: part,
-//		Enable: enable, OnlineAt: -1, OfflineAt: -1,
-//		IPName: IPName, Organization: organization,
-//		Extra:       map[string]interface{}{},
-//		Platforms:   make(map[uint16]map[uint16]*ClientPlatform),
-//		LatestCodes: make(map[uint16]map[uint16]map[uint16]*ClientVersion),
-//	}
-//	//client.FieldsCheck = client.CheckFields
-//	return client
-//}
 
 func NewClientDefault(
 	teamId uint64, ip, part uint,
