@@ -45,6 +45,10 @@ func NewClientDefault(
 	return client
 }
 
+func NewClientJustId(id uint64) *Client {
+	return &Client{DBModel: &base.DBModel{Id: id}}
+}
+
 // IsOnline 是否上线
 func (c *Client) IsOnline() bool {
 	currentTime := time.Now().UnixMilli()
