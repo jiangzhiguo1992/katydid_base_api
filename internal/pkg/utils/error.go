@@ -21,6 +21,7 @@ const (
 	ErrorCodeDBFieldUnDef  = 1012
 	ErrorCodeDBDupPk       = 1001
 	ErrorCodeDBQueryParams = 1013
+	ErrorCodeDBNoFind      = 1014
 )
 
 // TODO:GG 国际化
@@ -38,6 +39,7 @@ var errorMessages = map[int]string{
 	ErrorCodeDBFieldUnDef:  "数据库字段未定义",
 	ErrorCodeDBDupPk:       "数据库唯一约束冲突",
 	ErrorCodeDBQueryParams: "数据库查询参数错误",
+	ErrorCodeDBNoFind:      "数据库未找到数据",
 }
 
 var errorCodes = map[string]int{

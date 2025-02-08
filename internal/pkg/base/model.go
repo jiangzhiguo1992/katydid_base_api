@@ -8,6 +8,8 @@ import (
 type (
 	DBModel struct {
 		//gorm.Model
+		//IDBModel
+
 		Id       uint64 `json:"id" gorm:"primarykey"`
 		CreateAt int64  `json:"createAt" gorm:"autoCreateTime:milli"`
 		UpdateAt int64  `json:"updateAt" gorm:"autoUpdateTime:milli"`
@@ -18,6 +20,10 @@ type (
 
 		FieldsCheck func() []*tools.CodeError `json:"-" gorm:"-:all"`
 	}
+
+	//IDBModel interface {
+	//	CheckFields() []*tools.CodeError
+	//}
 )
 
 //func NewDBModel(
@@ -39,6 +45,10 @@ func NewDBModelEmpty() *DBModel {
 		DeleteAt: nil,
 	}
 }
+
+//func (b *DBModel) CheckFields() []*tools.CodeError {
+//	panic("implement me")
+//}
 
 func (b *DBModel) BeforeSave(tx *gorm.DB) (err error) {
 	if b.FieldsCheck == nil {
