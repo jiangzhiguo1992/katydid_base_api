@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
-	"katydid_base_api/internal/client/model"
 	"katydid_base_api/internal/pkg/base"
 	"katydid_base_api/internal/pkg/setup"
 	"katydid_base_api/internal/pkg/utils"
+	"katydid_base_api/internal/team/model"
 	"katydid_base_api/tools"
 	"strings"
 	"time"
@@ -32,8 +32,8 @@ func AddClient(client *model.Client) *tools.CodeError {
 	if client == nil {
 		return utils.MatchErrorByCode(utils.ErrorCodeDBInsNil)
 	}
-	result := TX().Create(client) // .Omit("DeleteAt")
-	return utils.MatchErrorByErr(result.Error)
+	tx := TX().Create(client) // .Omit("DeleteAt")
+	return utils.MatchErrorByErr(tx.Error)
 }
 
 func DropClient(id uint64) (bool, *tools.CodeError) {
@@ -81,31 +81,27 @@ func UpdClientExtra(client *model.Client, extra map[string]interface{}) (bool, *
 
 func QueClient(id uint64) (*model.Client, *tools.CodeError) {
 	var client model.Client
-	err := TX().First(&client, id).Error
-	if (err != nil) && strings.Contains(err.Error(), "record not found") {
-		return nil, nil
+	tx := TX().Limit(1)
+	tx = tx.Find(&client, id)
+	if tx.RowsAffected <= 0 {
+		return nil, utils.MatchErrorByErr(tx.Error)
 	}
-	return &client, utils.MatchErrorByErr(err)
+	return &client, utils.MatchErrorByErr(tx.Error)
 }
 
 func QueClientByIpPart(ip, part uint) (*model.Client, *tools.CodeError) {
-	if ip <= 0 {
-		return nil, utils.MatchErrorByCode(utils.ErrorCodeDBQueryParams).WithSuffix("ip")
-	} else if part <= 0 {
-		return nil, utils.MatchErrorByCode(utils.ErrorCodeDBQueryParams).WithPrefix("part")
-	}
 	var client model.Client
-	tx := TX()
-	tx = tx.Where("ip = ?", ip).Where("part = ?", part)
-	err := tx.First(&client).Error
-	return &client, utils.MatchErrorByErr(err)
+	tx := TX().Where(&model.Client{IP: ip, Part: part}).Limit(1)
+	tx = tx.Find(&client)
+	if tx.RowsAffected <= 0 {
+		return nil, utils.MatchErrorByErr(tx.Error)
+	}
+	return &client, utils.MatchErrorByErr(tx.Error)
 }
 
-func QueClientsByIp(ip uint) ([]model.Client, *tools.CodeError) {
-	if ip <= 0 {
-		return nil, utils.MatchErrorByCode(utils.ErrorCodeDBQueryParams).WithSuffix("ip")
-	}
-	var clients []model.Client
-	err := TX().Where("ip = ?", ip).Find(&clients).Error
-	return clients, utils.MatchErrorByErr(err)
+func QueClientsByIp(ip uint, orders []string) ([]*model.Client, *tools.CodeError) {
+	var clients []*model.Client
+	tx := TX().Where("ip = ?", ip).Order(strings.Join(orders, ","))
+	tx = tx.Find(&clients)
+	return clients, utils.MatchErrorByErr(tx.Error)
 }

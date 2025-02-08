@@ -11,15 +11,16 @@ import (
 // Client 客户端
 type Client struct {
 	*base.DBModel
-	IP   uint `json:"IP"`   // 系列 (eg:大富翁IP)
-	Part uint `json:"part"` // 类型 (eg:单机版)
+	TeamId uint64 `json:"teamId"` // 团队
+	IP     uint   `json:"IP"`     // 系列 (eg:大富翁IP)
+	Part   uint   `json:"part"`   // 类型 (eg:单机版)
 
 	Enable    bool  `json:"enable"`    // 是否可用 (一般不用，下架之类的，没有reason)
 	OnlineAt  int64 `json:"onlineAt"`  // 上线时间 (时间没到时，只能停留在首页，提示bulletins)
 	OfflineAt int64 `json:"offlineAt"` // 下线时间 (时间到后，强制下线+升级/等待/...)
 
-	IPName       string `json:"IPName"`       // ip名称
-	Organization string `json:"organization"` // 组织
+	IPName string `json:"IPName"` // ip名称
+	//Organization string `json:"organization"` // 组织
 
 	Extra map[string]interface{} `json:"extra" gorm:"serializer:json"` // 额外信息
 
@@ -27,16 +28,34 @@ type Client struct {
 	LatestCodes map[uint16]map[uint16]map[uint16]*ClientVersion `json:"latestCodes" gorm:"-:all"` // [platform][area][market]最新publish版本号
 }
 
+//func NewClientDefault(
+//	IP uint, part uint,
+//	enable bool,
+//	IPName string, organization string,
+//) *Client {
+//	client := &Client{
+//		DBModel: base.NewDBModelEmpty(),
+//		IP:      IP, Part: part,
+//		Enable: enable, OnlineAt: -1, OfflineAt: -1,
+//		IPName: IPName, Organization: organization,
+//		Extra:       map[string]interface{}{},
+//		Platforms:   make(map[uint16]map[uint16]*ClientPlatform),
+//		LatestCodes: make(map[uint16]map[uint16]map[uint16]*ClientVersion),
+//	}
+//	//client.FieldsCheck = client.CheckFields
+//	return client
+//}
+
 func NewClientDefault(
-	IP uint, part uint,
+	teamId uint64, ip, part uint,
 	enable bool,
-	IPName string, organization string,
+	IPName string,
 ) *Client {
 	client := &Client{
 		DBModel: base.NewDBModelEmpty(),
-		IP:      IP, Part: part,
-		Enable: enable, OnlineAt: -1, OfflineAt: -1,
-		IPName: IPName, Organization: organization,
+		TeamId:  teamId, IP: ip, Part: part,
+		Enable: enable, OnlineAt: 0, OfflineAt: 0,
+		IPName:      IPName,
 		Extra:       map[string]interface{}{},
 		Platforms:   make(map[uint16]map[uint16]*ClientPlatform),
 		LatestCodes: make(map[uint16]map[uint16]map[uint16]*ClientVersion),
@@ -247,11 +266,11 @@ func (c *Client) CheckFields() []*tools.CodeError {
 	} else if len(c.IPName) > checkClientIPNameLen {
 		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("IPName"))
 	}
-	if len(c.Organization) <= 0 {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("Organization"))
-	} else if len(c.Organization) > checkClientOrganizationLen {
-		errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("Organization"))
-	}
+	//if len(c.Organization) <= 0 {
+	//	errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldNil).WithPrefix("Organization"))
+	//} else if len(c.Organization) > checkClientOrganizationLen {
+	//	errors = append(errors, utils.MatchErrorByCode(utils.ErrorCodeDBFieldLarge).WithPrefix("Organization"))
+	//}
 	for k, v := range c.Extra {
 		switch k {
 		case "website":
